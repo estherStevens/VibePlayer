@@ -5,6 +5,8 @@
     <string name="empty_state_title">No music found</string>
     <string name="empty_state_subtitle">Try scanning again or check your folders.</string>
     <string name="empty_state_scan_again">Scan again</string>
+    <string name="scanner_scanning">Scanning</string>>
+    <string name="scanner_scanning_subtitle">Scanning your device for music…</string>>
 
 
 
