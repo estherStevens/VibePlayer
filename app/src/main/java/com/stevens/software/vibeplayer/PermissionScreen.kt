@@ -1,5 +1,9 @@
 package com.stevens.software.vibeplayer
 
+import android.Manifest
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,11 +26,29 @@ import com.stevens.software.vibeplayer.ui.theme.extendedColours
 
 @Composable
 fun PermissionScreen() {
-    PermissionView()
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if(isGranted) {
+           //navigate away
+        }
+    }
+
+    PermissionView(
+        onLaunchPermissionDialog = {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                launcher.launch(Manifest.permission.READ_MEDIA_AUDIO)
+            } else {
+                launcher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
+        }
+    )
 }
 
 @Composable
-internal fun PermissionView(){
+internal fun PermissionView(
+    onLaunchPermissionDialog: () -> Unit,
+){
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -52,7 +74,7 @@ internal fun PermissionView(){
             )
             Spacer(Modifier.size(20.dp))
             PrimaryButton(
-                onClick = {}
+                onClick = onLaunchPermissionDialog
             )
         }
     }
@@ -79,5 +101,7 @@ private fun PrimaryButton(
 @Composable
 @Preview(showSystemUi = true)
 fun PermissionViewPreview(){
-    PermissionView()
+    PermissionView(
+        onLaunchPermissionDialog = {}
+    )
 }
