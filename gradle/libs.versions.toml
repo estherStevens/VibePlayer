@@ -9,6 +9,9 @@ lifecycleRuntimeKtx = "2.10.0"
 activityCompose = "1.12.1"
 composeBom = "2024.09.00"
 core_splashscreen = "1.2.0"
+compose_nav = "2.9.6"
+kotlin_serialization = "1.9.0"
+kotlin_serialization_plugin = "2.2.21"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -26,9 +29,11 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "core_splashscreen" }
+compose_navigation = { group = "androidx.navigation", name = "navigation-compose", version.ref = "compose_nav" }
+kotlin-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlin_serialization" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-
+kotlin-serialize = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin_serialization_plugin" }

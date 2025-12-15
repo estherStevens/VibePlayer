@@ -18,7 +18,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             VibePlayerTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    PermissionScreen()
+                    MainNavController()
                 }
             }
         }

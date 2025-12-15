@@ -1,6 +1,7 @@
 package com.stevens.software.vibeplayer
 
 import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -18,29 +19,47 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import com.stevens.software.vibeplayer.ui.theme.extendedColours
 
 @Composable
-fun PermissionScreen() {
+fun PermissionScreen(
+    onNavigateToVibePlayer: () -> Unit
+) {
+    val context = LocalContext.current
+    val permission =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Manifest.permission.READ_MEDIA_AUDIO
+        } else {
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        }
+
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if(isGranted) {
-           //navigate away
+            onNavigateToVibePlayer()
         }
+    }
+
+    val hasReadMediaPermission =
+        ContextCompat.checkSelfPermission(
+            context,
+            permission
+        ) == PackageManager.PERMISSION_GRANTED
+
+    if (hasReadMediaPermission) {
+        onNavigateToVibePlayer()
     }
 
     PermissionView(
         onLaunchPermissionDialog = {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                launcher.launch(Manifest.permission.READ_MEDIA_AUDIO)
-            } else {
-                launcher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
-            }
+            launcher.launch(permission)
         }
     )
 }
