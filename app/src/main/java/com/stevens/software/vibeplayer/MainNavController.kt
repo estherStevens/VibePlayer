@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import kotlinx.serialization.Serializable
+import org.koin.androidx.compose.koinViewModel
 
 @Serializable
 object PermissionScreen
@@ -24,7 +25,9 @@ fun MainNavController() {
             )
         }
         composable<VibePlayer> {
-            VibePlayerScreen()
+            VibePlayerScreen(
+                viewModel = koinViewModel()
+            )
         }
     }
 }

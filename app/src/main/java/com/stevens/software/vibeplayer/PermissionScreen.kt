@@ -12,8 +12,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,6 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import com.stevens.software.vibeplayer.ui.theme.PrimaryButton
 import com.stevens.software.vibeplayer.ui.theme.extendedColours
 
 @Composable
@@ -93,29 +92,13 @@ internal fun PermissionView(
             )
             Spacer(Modifier.size(20.dp))
             PrimaryButton(
+                buttonText = R.string.permission_allow_access,
                 onClick = onLaunchPermissionDialog
             )
         }
     }
 }
 
-@Composable
-private fun PrimaryButton(
-    onClick: () -> Unit
-){
-    Button(
-        onClick = onClick,
-        colors = ButtonDefaults.buttonColors().copy(
-            containerColor = MaterialTheme.extendedColours.buttonPrimary
-        )
-    ) {
-        Text(
-            text = stringResource(R.string.permission_allow_access),
-            color = MaterialTheme.extendedColours.textPrimary,
-            style = MaterialTheme.typography.bodyLarge
-        )
-    }
-}
 
 @Composable
 @Preview(showSystemUi = true)
