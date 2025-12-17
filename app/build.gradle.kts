@@ -55,6 +55,7 @@ dependencies {
     implementation(libs.kotlin.serialization)
     implementation(libs.koin)
     implementation(libs.koin.compose)
+    implementation(libs.coil)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

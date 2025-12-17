@@ -1,5 +1,6 @@
 package com.stevens.software.vibeplayer
 
+import android.net.Uri
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -16,6 +17,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -34,8 +37,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
 import com.stevens.software.vibeplayer.ui.theme.PrimaryButton
 import com.stevens.software.vibeplayer.ui.theme.extendedColours
+import androidx.core.net.toUri
 
 @Composable
 fun VibePlayerScreen(viewModel: VibePlayerViewModel) {
@@ -75,7 +80,9 @@ fun VibePlayerView(uiState: VibePlayerState) {
             when(uiState) {
                 VibePlayerState.Empty -> EmptyState()
                 VibePlayerState.Scanning -> ScannerState()
-                VibePlayerState.Tracks -> TracksState()
+                is VibePlayerState.Tracks -> {
+                    TracksState(tracks = uiState.tracks)
+                }
             }
         }
 
@@ -150,39 +157,62 @@ private fun Scanner(){
 }
 
 @Composable
-private fun TracksState(){
-    TrackItem()
+private fun TracksState(tracks: List<MediaItemUi>){
+    LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        items(tracks) {
+            TrackItem(
+                albumArt = it.albumArt,
+                artist = it.artist,
+                trackTitle = it.title,
+                duration = it.duration
+            )
+        }
+    }
+
 }
 
 @Composable
-private fun TrackItem(){
+private fun TrackItem(
+    albumArt: Uri,
+    artist: String,
+    trackTitle: String,
+    duration: String
+){
     Row(
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(horizontal = 16.dp)
     ) {
         Box(
             modifier = Modifier
                 .size(64.dp)
                 .clip(RoundedCornerShape(10.dp))
         ) {
-
+            AsyncImage(
+                model = albumArt,
+                contentDescription = null,
+                modifier = Modifier.size(64.dp)
+            )
         }
         Spacer(Modifier.size(12.dp))
-        Column {
+        Column(
+            modifier = Modifier.weight(2f)
+        ) {
             Text(
-                text = "505",
+                text = trackTitle,
                 color = MaterialTheme.extendedColours.textPrimary,
                 style = MaterialTheme.typography.titleMedium
             )
             Spacer(Modifier.size(2.dp))
             Text(
-                text = "Arctic Monkeys",
+                text = artist,
                 color = MaterialTheme.extendedColours.textSecondary,
                 style = MaterialTheme.typography.bodyMedium
             )
         }
-        Spacer(Modifier.weight(1f))
         Text(
-            text = "4:14",
+            text = duration,
             color = MaterialTheme.extendedColours.textSecondary,
             style = MaterialTheme.typography.bodyMedium
         )
@@ -198,7 +228,14 @@ private fun EmptyStateView(){
 @Preview(showSystemUi = true)
 @Composable
 private fun TracksView(){
-    VibePlayerView(VibePlayerState.Tracks)
+    VibePlayerView(VibePlayerState.Tracks(
+        listOf(MediaItemUi(
+            title = "really really really really  really long title",
+            duration = "3:00",
+            albumArt = Uri.EMPTY,
+            artist = "Arctic Monkeys"
+        ))
+    ))
 }
 
 @Preview(showSystemUi = true)
