@@ -42,20 +42,19 @@ class VibePlayerViewModel(
 
 
     fun AudioItem.toUi() = MediaItemUi(
+        id = this.id,
         title = this.title,
         albumArt = this.albumArt,
         artist = this.artist,
         duration = this.duration.toMinutesSeconds()
     ) //todo move to repo
 
-     fun play(){
+     fun playById(id: String){
          viewModelScope.launch {
-             playbackManager.play()
+             playbackManager.playById(id)
          }
 
     }
-
-
 
 }
 
@@ -66,6 +65,7 @@ sealed interface VibePlayerState{
 }
 
 data class MediaItemUi(
+    val id: String,
     val title: String,
     val albumArt: Uri,
     val duration: String,

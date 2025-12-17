@@ -44,13 +44,13 @@ import com.stevens.software.vibeplayer.ui.theme.extendedColours
 fun VibePlayerScreen(viewModel: VibePlayerViewModel) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
     VibePlayerView(uiState = uiState.value,
-        onClick = { viewModel.play() })
+        onPlayTrack = { viewModel.playById(it) })
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VibePlayerView(uiState: VibePlayerState,
-                   onClick: () -> Unit) {
+                   onPlayTrack: (String) -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -83,7 +83,7 @@ fun VibePlayerView(uiState: VibePlayerState,
                 is VibePlayerState.Tracks -> {
                     TracksState(
                         tracks = uiState.tracks,
-                        onClick = onClick
+                        onPlayTrack = onPlayTrack
                     )
                 }
             }
@@ -161,17 +161,18 @@ private fun Scanner(){
 
 @Composable
 private fun TracksState(tracks: List<MediaItemUi>,
-                        onClick: () -> Unit){
+                        onPlayTrack: (String) -> Unit){
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         items(tracks) {
             TrackItem(
+                id = it.id,
                 albumArt = it.albumArt,
                 artist = it.artist,
                 trackTitle = it.title,
                 duration = it.duration,
-                onClick = onClick
+                onPlayTrack = onPlayTrack
             )
         }
     }
@@ -180,17 +181,18 @@ private fun TracksState(tracks: List<MediaItemUi>,
 
 @Composable
 private fun TrackItem(
+    id: String,
     albumArt: Uri,
     artist: String,
     trackTitle: String,
     duration: String,
-    onClick: () -> Unit,
+    onPlayTrack: (String) -> Unit,
 ){
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(horizontal = 16.dp)
             .clickable{
-                onClick()
+                onPlayTrack(id)
             }
     ) {
         Box(

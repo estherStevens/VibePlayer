@@ -62,6 +62,7 @@ class PlaybackManager(
             mediaItems.add(
                 MediaItem.Builder()
                     .setUri(audioItem.uri)
+                    .setMediaId(audioItem.id)
                     .setMediaMetadata(
                         MediaMetadata.Builder()
                             .setTitle(audioItem.title)
@@ -76,9 +77,16 @@ class PlaybackManager(
         controller.prepare()
     }
 
-    suspend fun play() {
+    suspend fun playById(id: String) {
         val controller = awaitController()
-        controller.play()
+        for (i in 0 until controller.mediaItemCount) {
+            val item = controller.getMediaItemAt(i)
+            if (item.mediaId == id) {
+                controller.seekTo(i, 0)
+                controller.play()
+                return
+            }
+        }
     }
 }
 

@@ -53,10 +53,11 @@ class MediaProviderImpl(private val context: Context) : MediaProvider{
                 val uri =  ContentUris.withAppendedId(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id
                 )
+                val mediaId = "${id}_${title}"
 
                 media.add(
                     AudioItem(
-                        uri, artist, title, albumArtUri,  duration.milliseconds
+                        mediaId, uri, artist, title, albumArtUri,  duration.milliseconds
                     )
                 )
             }
@@ -66,6 +67,7 @@ class MediaProviderImpl(private val context: Context) : MediaProvider{
 }
 
 data class AudioItem(
+    val id: String,
     val uri: Uri,
     val artist: String,
     val title: String,
