@@ -1,13 +1,19 @@
 package com.stevens.software.vibeplayer.media
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
-
 class MediaRepository(
-    private val mediaProvider: MediaProvider
+    private val mediaProvider: MediaProvider,
+    private val playbackManager: PlaybackManager
 ) {
 
-    fun loadMedia() : Flow<List<MediaItem>>{
-        return  mediaProvider.getMedia()
+    val mediaItems = mediaProvider.mediaItems
+
+    suspend fun setMediaPlaylist(){
+        playbackManager.setPlaylist(mediaItems.value)
     }
+
+    suspend fun fetchMedia(){
+        mediaProvider.fetchMedia()
+    }
+
+
 }

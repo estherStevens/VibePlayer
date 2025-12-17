@@ -1,7 +1,8 @@
 package com.stevens.software.vibeplayer.media
 
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 interface MediaProvider {
-    fun getMedia(): Flow<List<MediaItem>>
+    val mediaItems: StateFlow<List<AudioItem>>
+    suspend fun fetchMedia()
 }

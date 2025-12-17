@@ -7,6 +7,10 @@
     <string name="empty_state_scan_again">Scan again</string>
     <string name="scanner_scanning">Scanning</string>>
     <string name="scanner_scanning_subtitle">Scanning your device for music…</string>>
+    <string name="back">Back</string>>
+    <string name="previous_track">Previous track</string>>
+    <string name="next_track">Next track</string>>
+    <string name="play_track">Play</string>>
 
 
 

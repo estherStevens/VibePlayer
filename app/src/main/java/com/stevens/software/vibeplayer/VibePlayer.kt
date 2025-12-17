@@ -9,6 +9,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,7 +22,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -34,23 +34,23 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.stevens.software.vibeplayer.ui.theme.PrimaryButton
 import com.stevens.software.vibeplayer.ui.theme.extendedColours
-import androidx.core.net.toUri
 
 @Composable
 fun VibePlayerScreen(viewModel: VibePlayerViewModel) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
-    VibePlayerView(uiState.value)
+    VibePlayerView(uiState = uiState.value,
+        onClick = { viewModel.play() })
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun VibePlayerView(uiState: VibePlayerState) {
+fun VibePlayerView(uiState: VibePlayerState,
+                   onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -81,7 +81,10 @@ fun VibePlayerView(uiState: VibePlayerState) {
                 VibePlayerState.Empty -> EmptyState()
                 VibePlayerState.Scanning -> ScannerState()
                 is VibePlayerState.Tracks -> {
-                    TracksState(tracks = uiState.tracks)
+                    TracksState(
+                        tracks = uiState.tracks,
+                        onClick = onClick
+                    )
                 }
             }
         }
@@ -157,7 +160,8 @@ private fun Scanner(){
 }
 
 @Composable
-private fun TracksState(tracks: List<MediaItemUi>){
+private fun TracksState(tracks: List<MediaItemUi>,
+                        onClick: () -> Unit){
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -166,7 +170,8 @@ private fun TracksState(tracks: List<MediaItemUi>){
                 albumArt = it.albumArt,
                 artist = it.artist,
                 trackTitle = it.title,
-                duration = it.duration
+                duration = it.duration,
+                onClick = onClick
             )
         }
     }
@@ -178,11 +183,15 @@ private fun TrackItem(
     albumArt: Uri,
     artist: String,
     trackTitle: String,
-    duration: String
+    duration: String,
+    onClick: () -> Unit,
 ){
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(horizontal = 16.dp)
+            .clickable{
+                onClick()
+            }
     ) {
         Box(
             modifier = Modifier
@@ -219,27 +228,27 @@ private fun TrackItem(
     }
 }
 
-@Preview(showSystemUi = true)
-@Composable
-private fun EmptyStateView(){
-    VibePlayerView(VibePlayerState.Empty)
-}
-
-@Preview(showSystemUi = true)
-@Composable
-private fun TracksView(){
-    VibePlayerView(VibePlayerState.Tracks(
-        listOf(MediaItemUi(
-            title = "really really really really  really long title",
-            duration = "3:00",
-            albumArt = Uri.EMPTY,
-            artist = "Arctic Monkeys"
-        ))
-    ))
-}
-
-@Preview(showSystemUi = true)
-@Composable
-private fun ScannerView(){
-    VibePlayerView(VibePlayerState.Scanning)
-}
+//@Preview(showSystemUi = true)
+//@Composable
+//private fun EmptyStateView(){
+//    VibePlayerView(VibePlayerState.Empty)
+//}
+//
+//@Preview(showSystemUi = true)
+//@Composable
+//private fun TracksView(){
+//    VibePlayerView(VibePlayerState.Tracks(
+//        listOf(MediaItemUi(
+//            title = "really really really really  really long title",
+//            duration = "3:00",
+//            albumArt = Uri.EMPTY,
+//            artist = "Arctic Monkeys"
+//        ))
+//    ))
+//}
+//
+//@Preview(showSystemUi = true)
+//@Composable
+//private fun ScannerView(){
+//    VibePlayerView(VibePlayerState.Scanning)
+//}

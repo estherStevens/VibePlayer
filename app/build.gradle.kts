@@ -56,6 +56,10 @@ dependencies {
     implementation(libs.koin)
     implementation(libs.koin.compose)
     implementation(libs.coil)
+//    implementation(libs.medai3.bom)
+    implementation(libs.medai3.session)
+    implementation(libs.medai3.exoplayer)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
