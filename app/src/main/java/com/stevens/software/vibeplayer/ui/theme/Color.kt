@@ -8,6 +8,7 @@ val MuteBlue = Color(0xFFA7BBD1)
 val Blue = Color(0xFF4C647C)
 val DarkBlue = Color(0xFF0A131D)
 val Green = Color(0xFFF1FF95)
+val Grey = Color(0xFF1A2735)
 
 data class ExtendedColours(
     val buttonPrimary: Color,
@@ -15,7 +16,8 @@ data class ExtendedColours(
     val textSecondary: Color,
     val textDisabled: Color,
     val bg: Color,
-    val accent: Color
+    val accent: Color,
+    val outline: Color,
 )
 
 
@@ -25,5 +27,7 @@ val extendedColors = ExtendedColours(
     textSecondary = MuteBlue,
     textDisabled = Blue,
     bg = DarkBlue,
-    accent = Green
+    accent = Green,
+    outline = Grey
+
 )

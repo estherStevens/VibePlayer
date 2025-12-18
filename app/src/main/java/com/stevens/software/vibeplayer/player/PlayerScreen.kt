@@ -9,12 +9,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -53,17 +57,22 @@ fun PlayerScreen(
         title = uiState.value.title,
         artist = uiState.value.artist,
         artworkUri = uiState.value.artworkUri,
+        currentPosition = uiState.value.currentPosition,
+        duration = uiState.value.duration,
         onBack = { viewModel.onBack() },
         onPause = { viewModel.pause() },
         onResume = { viewModel.resume() },
         onSkipToNextTrack = { viewModel.onSkipToNextTrack() },
-        onSkipToPreviousTrack = { viewModel.onSkipToPreviousTrack() }
+        onSkipToPreviousTrack = { viewModel.onSkipToPreviousTrack() },
+        onSeek = { viewModel.onSeek(it) }
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayerView(
+    currentPosition: Long,
+    duration: Long,
     isPlaying: Boolean,
     title: String,
     artist: String,
@@ -72,7 +81,8 @@ fun PlayerView(
     onPause: () -> Unit,
     onResume: () -> Unit,
     onSkipToNextTrack: () -> Unit,
-    onSkipToPreviousTrack: () -> Unit
+    onSkipToPreviousTrack: () -> Unit,
+    onSeek: (Long) -> Unit
 ){
     Box(
         modifier = Modifier
@@ -118,11 +128,14 @@ fun PlayerView(
             Artist(artist)
             Spacer(Modifier.weight(1f))
             TrackControls(
+                currentPosition = currentPosition,
+                duration = duration,
                 isPlaying = isPlaying,
                 onPause = onPause,
                 onResume = onResume,
                 onSkipToNextTrack = onSkipToNextTrack,
-                onSkipToPreviousTrack = onSkipToPreviousTrack
+                onSkipToPreviousTrack = onSkipToPreviousTrack,
+                onSeek = onSeek
             )
         }
     }
@@ -148,55 +161,115 @@ private fun Artist(artist: String){
 
 @Composable
 private fun TrackControls(
+    currentPosition: Long,
+    duration: Long,
     isPlaying: Boolean,
     onPause: () -> Unit,
     onResume: () -> Unit,
+    onSeek: (Long) -> Unit,
     onSkipToNextTrack: () -> Unit,
     onSkipToPreviousTrack: () -> Unit
 ){
-    Row(
-        verticalAlignment = Alignment.CenterVertically, 
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier.padding(bottom = 30.dp)
+    Column(
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
     ) {
-        Icon(
-            painter = painterResource(R.drawable.player_back),
-            contentDescription = stringResource(R.string.previous_track),
-            tint = Color.Unspecified,
-            modifier = Modifier.clickable{
-                onSkipToPreviousTrack()
-            }
-        )
 
-        if(isPlaying) {
+        SeekBar(
+            currentPosition = currentPosition,
+            duration = duration,
+            onSeek = onSeek
+        )
+        Spacer(Modifier.size(20.dp))
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .padding(bottom = 30.dp)
+                .fillMaxWidth()
+        ) {
             Icon(
-                painter = painterResource(R.drawable.player_pause),
-                contentDescription = stringResource(R.string.play_track),
+                painter = painterResource(R.drawable.player_back),
+                contentDescription = stringResource(R.string.previous_track),
                 tint = Color.Unspecified,
                 modifier = Modifier.clickable {
-                    onPause()
+                    onSkipToPreviousTrack()
                 }
             )
-        } else {
+            Spacer(Modifier.size(12.dp))
+            if (isPlaying) {
+                Icon(
+                    painter = painterResource(R.drawable.player_pause),
+                    contentDescription = stringResource(R.string.play_track),
+                    tint = Color.Unspecified,
+                    modifier = Modifier.clickable {
+                        onPause()
+                    }
+                )
+            } else {
+                Icon(
+                    painter = painterResource(R.drawable.player_play),
+                    contentDescription = stringResource(R.string.play_track),
+                    tint = Color.Unspecified,
+                    modifier = Modifier.clickable {
+                        onResume()
+                    }
+                )
+            }
+            Spacer(Modifier.size(12.dp))
             Icon(
-                painter = painterResource(R.drawable.player_play),
-                contentDescription = stringResource(R.string.play_track),
+                painter = painterResource(R.drawable.player_skip),
+                contentDescription = stringResource(R.string.next_track),
                 tint = Color.Unspecified,
-                modifier = Modifier.clickable{
-                    onResume()
+                modifier = Modifier.clickable {
+                    onSkipToNextTrack()
                 }
             )
         }
-
-        Icon(
-            painter = painterResource(R.drawable.player_skip),
-            contentDescription = stringResource(R.string.next_track),
-            tint = Color.Unspecified,
-            modifier = Modifier.clickable{
-                onSkipToNextTrack()
-            }
-        )
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SeekBar(
+    currentPosition: Long,
+    duration: Long,
+    onSeek: (Long) -> Unit
+){
+    val progress = if (duration > 0L) {
+        currentPosition / duration.toFloat()
+    } else 0f //todo move to uistate
+
+
+    Slider(
+        value = progress,
+        onValueChangeFinished = {},
+        onValueChange = { fraction ->
+            onSeek((fraction * duration).toLong())
+        },
+        modifier = Modifier
+            .fillMaxWidth(),
+
+        colors = SliderDefaults.colors().copy(
+            activeTrackColor = MaterialTheme.extendedColours.textPrimary,
+            inactiveTrackColor = MaterialTheme.extendedColours.outline,
+            thumbColor = Color.Transparent,
+        ),
+        thumb = {},
+        track = { sliderState ->
+            SliderDefaults.Track(
+                modifier = Modifier.height(6.dp),
+                sliderState = sliderState,
+                thumbTrackGapSize = 0.dp,
+                drawStopIndicator = null,
+                colors = SliderDefaults.colors().copy(
+                    activeTrackColor = MaterialTheme.extendedColours.textPrimary,
+                    inactiveTrackColor = MaterialTheme.extendedColours.outline
+                )
+            )
+        }
+    )
 }
 
 
@@ -208,10 +281,13 @@ private fun PlayerViewPreview(){
         title = "505",
         artist = "Arctic Monkeys",
         artworkUri = Uri.EMPTY,
+        currentPosition = 0,
+        duration = 0,
         onBack = {},
         onPause = {},
         onResume = {},
         onSkipToNextTrack = {},
-        onSkipToPreviousTrack = {}
+        onSkipToPreviousTrack = {},
+        onSeek = {}
     )
 }

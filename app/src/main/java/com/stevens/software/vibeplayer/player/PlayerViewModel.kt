@@ -27,6 +27,8 @@ class PlayerViewModel(
     val uiState: StateFlow<PlayerUiState> = combine(_isLoading, playbackManager.state)
     { isLoading, playbackState ->
         PlayerUiState(
+            currentPosition = playbackState.currentPosition,
+            duration = playbackState.duration,
             isPlaying = playbackState.isPlaying,
             artist = playbackState.artist,
             title = playbackState.title,
@@ -37,6 +39,8 @@ class PlayerViewModel(
         SharingStarted.WhileSubscribed(),
         PlayerUiState(
             isPlaying = false,
+            currentPosition = 0,
+            duration = 0L,
             title = "",
             artist = "",
             artworkUri = Uri.EMPTY
@@ -83,9 +87,17 @@ class PlayerViewModel(
             playbackManager.stop()
         }
     }
+
+    fun onSeek(position: Long){
+        viewModelScope.launch {
+            playbackManager.seek(position)
+        }
+    }
 }
 
 data class PlayerUiState(
+    val currentPosition: Long,
+    val duration: Long,
     val isPlaying: Boolean,
     val title: String,
     val artist: String,

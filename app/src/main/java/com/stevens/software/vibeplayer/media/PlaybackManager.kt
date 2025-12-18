@@ -2,17 +2,28 @@ package com.stevens.software.vibeplayer.media
 
 import android.content.ComponentName
 import android.content.Context
+import android.media.session.PlaybackState
 import android.net.Uri
 import androidx.core.content.ContextCompat
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CompletableJob
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class PlaybackManager(
     private val context: Context
@@ -23,9 +34,14 @@ class PlaybackManager(
         ComponentName(appContext, MediaService::class.java)
     )
     private val controllerFuture = MediaController.Builder(appContext, sessionToken).buildAsync()
+    private val controllerDeferred = CompletableDeferred<MediaController>()
+    private var job: Job = SupervisorJob()
+    private val scope = CoroutineScope(Dispatchers.Main + job)
+
+    private val _position: MutableStateFlow<Long> = MutableStateFlow(0)
     private val _state: MutableStateFlow<AudioPlaybackState> = MutableStateFlow(AudioPlaybackState())
     val state: StateFlow<AudioPlaybackState> = _state.asStateFlow()
-    private val controllerDeferred = CompletableDeferred<MediaController>()
+
 
     init {
         controllerFuture.addListener(
@@ -40,12 +56,53 @@ class PlaybackManager(
 
     private suspend fun awaitController(): MediaController = controllerDeferred.await()
 
+    private fun startUpdatingPosition(controller: MediaController){
+        job = scope.launch {
+            while (true) {
+                if(controller.isPlaying){
+                    _state.update {
+                        it.copy(
+                            currentPosition = controller.currentPosition
+                        )
+                    }
+                    delay(1000)
+                }
+            }
+        }
+    }
+
+    fun release() {
+        job.cancel()
+    }
+
     private fun observePlayer(controller: MediaController) {
-        controller.addListener(object : androidx.media3.common.Player.Listener {
+        controller.addListener(object : Player.Listener {
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 super.onIsPlayingChanged(isPlaying)
                 _state.update {
                     it.copy(isPlaying = isPlaying)
+                }
+                if(isPlaying) {
+                    startUpdatingPosition(controller = controller)
+                    _state.update {
+                        it.copy(
+                            duration = controller.contentDuration
+                        )
+                    }
+                } else {
+                    release()
+                }
+            }
+
+            override fun onPositionDiscontinuity(
+                oldPosition: Player.PositionInfo,
+                newPosition: Player.PositionInfo,
+                reason: Int
+            ) {
+                super.onPositionDiscontinuity(oldPosition, newPosition, reason)
+                if(reason == Player.EVENT_POSITION_DISCONTINUITY) {
+                    val i = newPosition.positionMs
+                    _position.update { newPosition.positionMs }
                 }
             }
 
@@ -121,9 +178,16 @@ class PlaybackManager(
         val controller = awaitController()
         controller.stop()
     }
+
+    suspend fun seek(position: Long) {
+        val controller = awaitController()
+        controller.seekTo(position)
+    }
 }
 
 data class AudioPlaybackState(
+    val currentPosition: Long = 0L,
+    val duration: Long = 0L,
     val isPlaying: Boolean = false,
     val title: String = "",
     val artist: String = "",
