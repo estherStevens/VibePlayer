@@ -10,7 +10,6 @@ import com.stevens.software.vibeplayer.media.PlaybackManager
 import com.stevens.software.vibeplayer.utils.toMinutesSeconds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -31,7 +30,7 @@ class VibePlayerViewModel(
         if (it.isEmpty()) {
             VibePlayerState.Empty
         } else {
-            mediaRepository.setMediaPlaylist()
+            mediaRepository.setMediaPlaylist(it)
             VibePlayerState.Tracks(it.map { track -> track.toUi() })
         }
     }.stateIn(

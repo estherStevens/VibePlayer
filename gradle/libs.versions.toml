@@ -1,6 +1,6 @@
 [versions]
 agp = "8.12.0-alpha06"
-kotlin = "2.2.21"
+kotlin = "2.2.20"
 coreKtx = "1.17.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
@@ -14,7 +14,9 @@ kotlin_serialization = "1.9.0"
 kotlin_serialization_plugin = "2.2.21"
 koin_version = "4.1.1"
 coil = "3.3.0"
-media_bom = "1.3.1"
+media_bom = "1.9.0"
+room = "2.8.4"
+ksp = "2.2.20-2.0.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -37,12 +39,15 @@ kotlin-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serial
 koin =  { group = "io.insert-koin", name = "koin-android",  version.ref = "koin_version"}
 koin-compose =  { group = "io.insert-koin", name = "koin-androidx-compose",  version.ref = "koin_version"}
 coil =  { group = "io.coil-kt.coil3", name = "coil-compose",  version.ref = "coil"}
-medai3-bom = { group = "androidx.media3", name = "media3-bom", version.ref = "media_bom" }
 medai3-exoplayer= { group = "androidx.media3", name = "media3-exoplayer", version.ref = "media_bom" }
 medai3-session = { group = "androidx.media3", name = "media3-session", version.ref = "media_bom" }
+room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialize = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin_serialization_plugin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

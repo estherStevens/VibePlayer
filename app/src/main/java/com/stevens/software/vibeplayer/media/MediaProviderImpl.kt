@@ -4,15 +4,33 @@ import android.content.ContentUris
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import com.stevens.software.vibeplayer.core.AudioFile
+import com.stevens.software.vibeplayer.core.AudioFileRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import androidx.core.net.toUri
+import java.time.OffsetDateTime
 
-class MediaProviderImpl(private val context: Context) : MediaProvider{
+class MediaProviderImpl(
+    private val context: Context,
+    private val audioFileRepository: AudioFileRepository
+    ) : MediaProvider{
 
-    private val _mediaItems: MutableStateFlow<List<AudioItem>> = MutableStateFlow(emptyList())
-    override val mediaItems = _mediaItems.asStateFlow()
+    override val mediaItems: Flow<List<AudioItem>> = audioFileRepository.getAllAudioFile()
+        .map { entities ->
+            entities.map { audioFile ->
+                AudioItem(
+                    id = audioFile.id,
+                    uri = audioFile.fileUri.toUri(),
+                    artist = audioFile.artist,
+                    title = audioFile.title,
+                    albumArt = audioFile.artworkUri.toUri(),
+                    duration = audioFile.duration.milliseconds
+                )
+            }
+        }
 
     override suspend fun fetchMedia(
         minFileSizeInMs: Int?,
@@ -47,8 +65,6 @@ class MediaProviderImpl(private val context: Context) : MediaProvider{
             "${MediaStore.Audio.Media.TITLE} ASC",
         )
 
-        val media: MutableList<AudioItem> = mutableListOf()
-
         cursor?.use {
             val id = it.getColumnIndex(MediaStore.Audio.Media._ID)
             val artist = it.getColumnIndex(MediaStore.Audio.Media.ARTIST)
@@ -69,16 +85,20 @@ class MediaProviderImpl(private val context: Context) : MediaProvider{
                 val uri =  ContentUris.withAppendedId(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id
                 )
-                val mediaId = "${id}_${title}"
+                val mediaId = "${id}_${title}_${OffsetDateTime.now()}"
 
-                media.add(
-                    AudioItem(
-                        mediaId, uri, artist, title, albumArtUri,  duration.milliseconds
+                audioFileRepository.insertAudioFile(
+                    AudioFile(
+                        id = mediaId,
+                        title = title,
+                        artist = artist,
+                        duration = duration,
+                        artworkUri = albumArtUri.toString(),
+                        fileUri = uri.toString()
                     )
                 )
             }
         }
-        _mediaItems.value = media
         return true
     }
 }

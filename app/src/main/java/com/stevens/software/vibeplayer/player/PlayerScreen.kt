@@ -241,7 +241,6 @@ private fun SeekBar(
         currentPosition / duration.toFloat()
     } else 0f //todo move to uistate
 
-
     Slider(
         value = progress,
         onValueChangeFinished = {},

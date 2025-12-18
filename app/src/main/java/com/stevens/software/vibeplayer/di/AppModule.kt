@@ -2,6 +2,7 @@ package com.stevens.software.vibeplayer.di
 
 import com.stevens.software.vibeplayer.media.MediaProviderImpl
 import com.stevens.software.vibeplayer.VibePlayerViewModel
+import com.stevens.software.vibeplayer.core.AudioFileRepository
 import com.stevens.software.vibeplayer.media.MediaService
 import com.stevens.software.vibeplayer.media.MediaProvider
 import com.stevens.software.vibeplayer.media.MediaRepository
@@ -21,5 +22,6 @@ val appModule = module {
     factoryOf(::MediaProviderImpl) bind MediaProvider::class
     factoryOf(::MediaRepository)
     factoryOf(::MediaService)
+    factoryOf(::AudioFileRepository)
     singleOf(::PlaybackManager)
 }

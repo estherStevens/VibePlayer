@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialize)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -56,9 +57,11 @@ dependencies {
     implementation(libs.koin)
     implementation(libs.koin.compose)
     implementation(libs.coil)
-//    implementation(libs.medai3.bom)
     implementation(libs.medai3.session)
     implementation(libs.medai3.exoplayer)
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

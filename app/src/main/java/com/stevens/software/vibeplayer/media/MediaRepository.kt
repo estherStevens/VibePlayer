@@ -7,8 +7,8 @@ class MediaRepository(
 
     val mediaItems = mediaProvider.mediaItems
 
-    suspend fun setMediaPlaylist(){
-        playbackManager.setPlaylist(mediaItems.value)
+    suspend fun setMediaPlaylist(audioItems: List<AudioItem>){
+        playbackManager.setPlaylist(audioItems)
     }
 
     suspend fun fetchFilteredMedia(
