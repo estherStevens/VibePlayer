@@ -4,5 +4,6 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface MediaProvider {
     val mediaItems: StateFlow<List<AudioItem>>
-    suspend fun fetchMedia()
+    suspend fun fetchMedia(minFileSizeInMs: Int? = null,
+                           minFileDurationInMs: Int? = null) : Boolean
 }

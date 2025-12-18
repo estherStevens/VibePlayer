@@ -11,9 +11,18 @@ class MediaRepository(
         playbackManager.setPlaylist(mediaItems.value)
     }
 
-    suspend fun fetchMedia(){
-        mediaProvider.fetchMedia()
+    suspend fun fetchFilteredMedia(
+        minFileSizeInMs: Int,
+        minFileDurationInMs: Int
+    ): Boolean {
+       return mediaProvider.fetchMedia(
+           minFileSizeInMs = minFileSizeInMs,
+           minFileDurationInMs = minFileDurationInMs
+       )
     }
 
+    suspend fun fetchAllMedia() {
+        mediaProvider.fetchMedia()
+    }
 
 }

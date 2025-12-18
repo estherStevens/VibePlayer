@@ -2,6 +2,7 @@ package com.stevens.software.vibeplayer.ui.theme
 
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -11,13 +12,16 @@ import androidx.compose.ui.res.stringResource
 fun PrimaryButton(
     buttonText: Int,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     onClick: () -> Unit
 ){
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors().copy(
-            containerColor = MaterialTheme.extendedColours.buttonPrimary
+            containerColor = MaterialTheme.extendedColours.buttonPrimary,
+            disabledContainerColor = MaterialTheme.extendedColours.buttonHover
         ),
+        enabled = enabled,
         modifier = modifier
     ) {
         Text(

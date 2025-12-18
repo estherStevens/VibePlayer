@@ -14,7 +14,10 @@ class MediaProviderImpl(private val context: Context) : MediaProvider{
     private val _mediaItems: MutableStateFlow<List<AudioItem>> = MutableStateFlow(emptyList())
     override val mediaItems = _mediaItems.asStateFlow()
 
-    override suspend fun fetchMedia() {
+    override suspend fun fetchMedia(
+        minFileSizeInMs: Int?,
+        minFileDurationInMs: Int?
+    ): Boolean {
         val projection = arrayOf(
             MediaStore.Audio.Media._ID,
             MediaStore.Audio.Media.ARTIST,
@@ -23,11 +26,24 @@ class MediaProviderImpl(private val context: Context) : MediaProvider{
             MediaStore.Audio.Media.DURATION,
         )
 
+        val selection: String?
+        val selectionArgs: Array<String>?
+        if(minFileSizeInMs == null && minFileDurationInMs == null) {
+            selection = null
+            selectionArgs = null
+        } else {
+            selection = "${MediaStore.Audio.Media.DURATION} > ? AND ${MediaStore.Audio.Media.SIZE} > ?"
+            selectionArgs = arrayOf(
+                (minFileSizeInMs).toString(),
+                (minFileDurationInMs?.times(1024)).toString()
+            )
+        }
+
         val cursor = context.contentResolver.query(
             MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
             projection,
-            null,
-            null,
+            selection,
+            selectionArgs,
             "${MediaStore.Audio.Media.TITLE} ASC",
         )
 
@@ -63,6 +79,7 @@ class MediaProviderImpl(private val context: Context) : MediaProvider{
             }
         }
         _mediaItems.value = media
+        return true
     }
 }
 

@@ -42,7 +42,7 @@ class VibePlayerViewModel(
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            mediaRepository.fetchMedia()
+            mediaRepository.fetchAllMedia()
         }
     }
 

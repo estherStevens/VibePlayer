@@ -61,7 +61,8 @@ fun MainNavController() {
         composable<ScanMusic> {
             ScanScreen(
                 viewModel = koinViewModel(),
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                onNavigateToTrackListing = { navController.popBackStack() }
             )
         }
     }

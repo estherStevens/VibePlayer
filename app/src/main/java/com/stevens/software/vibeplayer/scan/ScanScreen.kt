@@ -1,6 +1,5 @@
 package com.stevens.software.vibeplayer.scan
 
-import android.widget.RadioGroup
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,9 +22,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,7 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -47,18 +45,30 @@ import com.stevens.software.vibeplayer.ui.theme.extendedColours
 @Composable
 fun ScanScreen(
     viewModel: ScanViewModel,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onNavigateToTrackListing: () -> Unit
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.navigationEvents.collect {
+            when(it) {
+                ScanNavigationEvents.NavigateToTrackListing -> onNavigateToTrackListing()
+            }
+
+        }
+    }
 
     ScanView(
         fileDurationOptions = uiState.value.fileDurationOptions,
         fileSizeOptions = uiState.value.fileSizeOptions,
         selectedFileDurationOption = uiState.value.selectedFileDurationOption,
         selectedFileSizeOption = uiState.value.selectedFileSizeOption,
+        isScanning = uiState.value.isScanning,
         onBack = onBack,
         onSelectedFileSize = viewModel::updateSelectedFileSizeOption,
-        onSelectedFileDuration = viewModel::updateSelectedFileDurationOption
+        onSelectedFileDuration = viewModel::updateSelectedFileDurationOption,
+        onScan = viewModel::startScan
     )
 }
 
@@ -69,9 +79,11 @@ fun ScanView(
     fileSizeOptions: List<FileSizeOption>,
     selectedFileDurationOption: FileDurationOption,
     selectedFileSizeOption: FileSizeOption,
+    isScanning: Boolean,
     onBack: () -> Unit,
     onSelectedFileSize: (FileSizeOption) -> Unit,
-    onSelectedFileDuration: (FileDurationOption) -> Unit
+    onSelectedFileDuration: (FileDurationOption) -> Unit, 
+    onScan: () -> Unit
 ) {
     var selectedFileDuration by remember { mutableStateOf(selectedFileDurationOption) }
     var selectedFileSize by remember { mutableStateOf(selectedFileSizeOption) }
@@ -110,7 +122,7 @@ fun ScanView(
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
         ) {
-            Scanner(startAnimation = false)
+            Scanner(startAnimation = isScanning)
             Spacer(Modifier.size(24.dp))
             Text(
                 text = stringResource(R.string.scan_music_duration),
@@ -165,16 +177,33 @@ fun ScanView(
                 }
             }
             Spacer(Modifier.size(24.dp))
-            PrimaryButton(
-                buttonText = R.string.scan,
-                modifier = Modifier.fillMaxWidth(),
-                onClick = {}
+            ScanButton(
+                isScanning = isScanning,
+                onScan = onScan
             )
-
-
         }
-
     }
+}
+
+@Composable
+private fun ScanButton(
+    isScanning: Boolean,
+    onScan: () -> Unit
+){
+    val buttonText = when(isScanning) {
+        true -> R.string.scanning
+        false -> R.string.scan
+    }
+    val enabled = when(isScanning) {
+        true -> false
+        false -> true
+    }
+    PrimaryButton(
+        buttonText = buttonText,
+        enabled = enabled,
+        modifier = Modifier.fillMaxWidth(),
+        onClick = onScan
+    )
 }
 
 @Composable
@@ -231,10 +260,12 @@ fun ScanViewPreview() {
             FileSizeOption.ONE_HUNDRED_KBS,
             FileSizeOption.FIVE_HUNDRED_KBS
         ),
+        isScanning = false,
         selectedFileDurationOption = FileDurationOption.THIRTY_SECONDS,
         selectedFileSizeOption = FileSizeOption.ONE_HUNDRED_KBS,
         onSelectedFileDuration = {},
         onSelectedFileSize = {},
-        onBack = {}
+        onBack = {},
+        onScan = {}
     )
 }
