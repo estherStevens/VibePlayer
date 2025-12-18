@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.stevens.software.vibeplayer.player.PlayerScreen
+import com.stevens.software.vibeplayer.scan.ScanScreen
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -18,6 +19,9 @@ object VibePlayer
 
 @Serializable
 data class Player(val id: String)
+
+@Serializable
+object ScanMusic
 
 @Composable
 fun MainNavController() {
@@ -35,6 +39,9 @@ fun MainNavController() {
                 viewModel = koinViewModel(),
                 onNavigateToPlayer = {
                     navController.navigate(Player(it))
+                },
+                onNavigateToScanMusic = {
+                    navController.navigate(ScanMusic)
                 }
             )
         }
@@ -48,6 +55,12 @@ fun MainNavController() {
                         )
                     }
                 ),
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable<ScanMusic> {
+            ScanScreen(
+                viewModel = koinViewModel(),
                 onBack = { navController.popBackStack() }
             )
         }

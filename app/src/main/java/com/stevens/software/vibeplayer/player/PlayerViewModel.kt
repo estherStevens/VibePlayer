@@ -93,6 +93,11 @@ class PlayerViewModel(
             playbackManager.seek(position)
         }
     }
+
+    override fun onCleared() {
+        super.onCleared()
+        playbackManager.release()
+    }
 }
 
 data class PlayerUiState(

@@ -5,12 +5,21 @@
     <string name="empty_state_title">No music found</string>
     <string name="empty_state_subtitle">Try scanning again or check your folders.</string>
     <string name="empty_state_scan_again">Scan again</string>
-    <string name="scanner_scanning">Scanning</string>>
-    <string name="scanner_scanning_subtitle">Scanning your device for music…</string>>
-    <string name="back">Back</string>>
-    <string name="previous_track">Previous track</string>>
-    <string name="next_track">Next track</string>>
-    <string name="play_track">Play</string>>
+    <string name="scanner_scanning">Scanning</string>
+    <string name="scanner_scanning_subtitle">Scanning your device for music…</string>
+    <string name="back">Back</string>
+    <string name="previous_track">Previous track</string>
+    <string name="next_track">Next track</string>
+    <string name="play_track">Play</string>
+    <string name="scan_music">Scan Music</string>
+    <string name="scan_music_duration"> Ignore duration less than</string>
+    <string name="scan_music_size">Ignore size less than</string>
+    <string name="scan_music_duration_30s">30s</string>
+    <string name="scan_music_duration_60s">60s</string>
+    <string name="scan_music_size_100kb">100kb</string>
+    <string name="scan_music_size_500kb">500kb</string>
+    <string name="scan_for_music">Scan for Music</string>
+    <string name="scan">Scan</string>
 
 
 

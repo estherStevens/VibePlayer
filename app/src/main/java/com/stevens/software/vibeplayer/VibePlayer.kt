@@ -22,41 +22,62 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import com.stevens.software.vibeplayer.ui.common.Scanner
 import com.stevens.software.vibeplayer.ui.theme.PrimaryButton
 import com.stevens.software.vibeplayer.ui.theme.extendedColours
+import kotlinx.coroutines.flow.collect
 
 @Composable
 fun VibePlayerScreen(
     viewModel: VibePlayerViewModel,
-    onNavigateToPlayer: (String) -> Unit
+    onNavigateToPlayer: (String) -> Unit,
+    onNavigateToScanMusic: () -> Unit
     ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.navigationEvents.collect { event ->
+            when(event) {
+                is VibePlayerNavigationEvents.NavigateToPlayer -> {
+                    onNavigateToPlayer(event.id)
+                }
+                VibePlayerNavigationEvents.NavigateToScanMusic -> {
+                    onNavigateToScanMusic()
+                }
+            }
+        }
+    }
+
     VibePlayerView(
         uiState = uiState.value,
-//        onNavigateToPlayer = { viewModel.playById(it) },
-        onNavigateToPlayer = onNavigateToPlayer
+        onNavigateToPlayer = viewModel::onNavigateToPlayer,
+        onNavigateToScanMusic = viewModel::onNavigateToScanMusic
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VibePlayerView(uiState: VibePlayerState,
-                   onNavigateToPlayer: (String) -> Unit
+                   onNavigateToPlayer: (String) -> Unit,
+                   onNavigateToScanMusic: () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -70,6 +91,16 @@ fun VibePlayerView(uiState: VibePlayerState,
                         text = stringResource(R.string.app_name),
                         color = MaterialTheme.extendedColours.accent,
                         style = MaterialTheme.typography.bodyLarge
+                    )
+                },
+                actions = {
+                    Icon(
+                        painter = painterResource(R.drawable.scan_icon),
+                        contentDescription = stringResource(R.string.scan_for_music),
+                        tint = Color.Unspecified,
+                        modifier = Modifier.clickable{
+                            onNavigateToScanMusic()
+                        }
                     )
                 },
                 navigationIcon = {
@@ -132,7 +163,7 @@ private fun ScannerState(){
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Scanner()
+        Scanner(startAnimation = true)
         Spacer(Modifier.size(20.dp))
         Text(
             text = stringResource(R.string.scanner_scanning_subtitle),
@@ -141,29 +172,6 @@ private fun ScannerState(){
         )
     }
 
-}
-
-@Composable
-private fun Scanner(){
-    val infiniteTransition = rememberInfiniteTransition(label = "infinite")
-
-    val rotation by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 360f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(
-                durationMillis = 2000,
-                easing = LinearEasing
-            ),
-            repeatMode = RepeatMode.Restart
-        ),
-        label = "rotation"
-    )
-    Image(
-        painter = painterResource(R.drawable.scanner),
-        contentDescription = stringResource(R.string.scanner_scanning),
-        modifier = Modifier.rotate(rotation)
-    )
 }
 
 @Composable
@@ -237,7 +245,7 @@ private fun TrackItem(
         )
     }
 }
-
+//
 //@Preview(showSystemUi = true)
 //@Composable
 //private fun EmptyStateView(){
