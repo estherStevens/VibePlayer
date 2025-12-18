@@ -41,16 +41,23 @@ import com.stevens.software.vibeplayer.ui.theme.PrimaryButton
 import com.stevens.software.vibeplayer.ui.theme.extendedColours
 
 @Composable
-fun VibePlayerScreen(viewModel: VibePlayerViewModel) {
+fun VibePlayerScreen(
+    viewModel: VibePlayerViewModel,
+    onNavigateToPlayer: (String) -> Unit
+    ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
-    VibePlayerView(uiState = uiState.value,
-        onPlayTrack = { viewModel.playById(it) })
+    VibePlayerView(
+        uiState = uiState.value,
+//        onNavigateToPlayer = { viewModel.playById(it) },
+        onNavigateToPlayer = onNavigateToPlayer
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VibePlayerView(uiState: VibePlayerState,
-                   onPlayTrack: (String) -> Unit) {
+                   onNavigateToPlayer: (String) -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -83,7 +90,7 @@ fun VibePlayerView(uiState: VibePlayerState,
                 is VibePlayerState.Tracks -> {
                     TracksState(
                         tracks = uiState.tracks,
-                        onPlayTrack = onPlayTrack
+                        onNavigateToPlayer = onNavigateToPlayer
                     )
                 }
             }
@@ -161,7 +168,7 @@ private fun Scanner(){
 
 @Composable
 private fun TracksState(tracks: List<MediaItemUi>,
-                        onPlayTrack: (String) -> Unit){
+                        onNavigateToPlayer: (String) -> Unit){
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -172,7 +179,7 @@ private fun TracksState(tracks: List<MediaItemUi>,
                 artist = it.artist,
                 trackTitle = it.title,
                 duration = it.duration,
-                onPlayTrack = onPlayTrack
+                onNavigateToPlayer = onNavigateToPlayer
             )
         }
     }
@@ -186,13 +193,14 @@ private fun TrackItem(
     artist: String,
     trackTitle: String,
     duration: String,
-    onPlayTrack: (String) -> Unit,
+    onNavigateToPlayer: (String) -> Unit,
 ){
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(horizontal = 16.dp)
-            .clickable{
-                onPlayTrack(id)
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .clickable {
+                onNavigateToPlayer(id)
             }
     ) {
         Box(

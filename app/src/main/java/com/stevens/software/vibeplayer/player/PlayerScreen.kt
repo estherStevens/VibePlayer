@@ -1,7 +1,8 @@
 package com.stevens.software.vibeplayer.player
 
-import androidx.compose.foundation.Image
+import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,22 +23,45 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
 import com.stevens.software.vibeplayer.R
 import com.stevens.software.vibeplayer.ui.theme.extendedColours
 
 @Composable
 fun PlayerScreen(
+    viewModel: PlayerViewModel
 ) {
-
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+    PlayerView(
+        isPlaying = uiState.value.isPlaying,
+        title = uiState.value.title,
+        artist = uiState.value.artist,
+        artworkUri = uiState.value.artworkUri,
+        onPause = { viewModel.pause() },
+        onResume = { viewModel.resume() },
+        onSkipToNextTrack = { viewModel.onSkipToNextTrack() },
+        onSkipToPreviousTrack = { viewModel.onSkipToPreviousTrack() }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlayerView(){
+fun PlayerView(
+    isPlaying: Boolean,
+    title: String,
+    artist: String,
+    artworkUri: Uri,
+    onPause: () -> Unit,
+    onResume: () -> Unit,
+    onSkipToNextTrack: () -> Unit,
+    onSkipToPreviousTrack: () -> Unit
+){
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -66,41 +90,55 @@ fun PlayerView(){
                     .size(320.dp)
                     .clip(RoundedCornerShape(10.dp)),
             ){
-                Image(
-                    painter = painterResource(R.drawable.logo),
-                    contentDescription = null
+                AsyncImage(
+                    model = artworkUri,
+                    contentDescription = null,
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.size(320.dp)
                 )
             }
             Spacer(Modifier.size(24.dp))
-            TrackTitle()
+            TrackTitle(title)
             Spacer(Modifier.size(4.dp))
-            Artist()
+            Artist(artist)
             Spacer(Modifier.weight(1f))
-            TrackControls()
+            TrackControls(
+                isPlaying = isPlaying,
+                onPause = onPause,
+                onResume = onResume,
+                onSkipToNextTrack = onSkipToNextTrack,
+                onSkipToPreviousTrack = onSkipToPreviousTrack
+            )
         }
     }
 }
 
 @Composable
-private fun TrackTitle(){
+private fun TrackTitle(title: String){
     Text(
-        text = "505",
+        text = title,
         color = MaterialTheme.extendedColours.textPrimary,
         style = MaterialTheme.typography.titleLarge
     )
 }
 
 @Composable
-private fun Artist(){
+private fun Artist(artist: String){
     Text(
-        text = "Arctic Monkeys",
+        text = artist,
         color = MaterialTheme.extendedColours.textSecondary,
         style = MaterialTheme.typography.bodyMedium
     )
 }
 
 @Composable
-private fun TrackControls(){
+private fun TrackControls(
+    isPlaying: Boolean,
+    onPause: () -> Unit,
+    onResume: () -> Unit,
+    onSkipToNextTrack: () -> Unit,
+    onSkipToPreviousTrack: () -> Unit
+){
     Row(
         verticalAlignment = Alignment.CenterVertically, 
         horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -109,19 +147,39 @@ private fun TrackControls(){
         Icon(
             painter = painterResource(R.drawable.player_back),
             contentDescription = stringResource(R.string.previous_track),
-            tint = Color.Unspecified
+            tint = Color.Unspecified,
+            modifier = Modifier.clickable{
+                onSkipToPreviousTrack()
+            }
         )
 
-        Icon(
-            painter = painterResource(R.drawable.player_play),
-            contentDescription = stringResource(R.string.play_track),
-            tint = Color.Unspecified
-        )
+        if(isPlaying) {
+            Icon(
+                painter = painterResource(R.drawable.player_pause),
+                contentDescription = stringResource(R.string.play_track),
+                tint = Color.Unspecified,
+                modifier = Modifier.clickable {
+                    onPause()
+                }
+            )
+        } else {
+            Icon(
+                painter = painterResource(R.drawable.player_play),
+                contentDescription = stringResource(R.string.play_track),
+                tint = Color.Unspecified,
+                modifier = Modifier.clickable{
+                    onResume()
+                }
+            )
+        }
 
         Icon(
             painter = painterResource(R.drawable.player_skip),
             contentDescription = stringResource(R.string.next_track),
-            tint = Color.Unspecified
+            tint = Color.Unspecified,
+            modifier = Modifier.clickable{
+                onSkipToNextTrack()
+            }
         )
     }
 }
@@ -130,5 +188,14 @@ private fun TrackControls(){
 @Preview(showSystemUi = true)
 @Composable
 private fun PlayerViewPreview(){
-    PlayerView()
+    PlayerView(
+        isPlaying = false,
+        title = "505",
+        artist = "Arctic Monkeys",
+        artworkUri = Uri.EMPTY,
+        onPause = {},
+        onResume = {},
+        onSkipToNextTrack = {},
+        onSkipToPreviousTrack = {}
+    )
 }

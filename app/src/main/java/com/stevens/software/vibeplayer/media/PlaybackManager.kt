@@ -2,6 +2,7 @@ package com.stevens.software.vibeplayer.media
 
 import android.content.ComponentName
 import android.content.Context
+import android.net.Uri
 import androidx.core.content.ContextCompat
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
@@ -48,9 +49,17 @@ class PlaybackManager(
                 }
             }
 
-            override fun onPlaybackStateChanged(playbackState: Int) {
-                super.onPlaybackStateChanged(playbackState)
-                val p = playbackState
+            override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                super.onMediaItemTransition(mediaItem, reason)
+                mediaItem?.let { media ->
+                    _state.update {
+                        it.copy(
+                            title = media.mediaMetadata.title.toString(),
+                            artist = media.mediaMetadata.artist.toString(),
+                            artworkUri = media.mediaMetadata.artworkUri ?: Uri.EMPTY
+                        )
+                    }
+                }
             }
 
         })
@@ -88,9 +97,31 @@ class PlaybackManager(
             }
         }
     }
+
+    suspend fun pause(){
+        val controller = awaitController()
+        controller.pause()
+    }
+
+    suspend fun resume(){
+        val controller = awaitController()
+        controller.play()
+    }
+
+    suspend fun skipToNextTrack(){
+        val controller = awaitController()
+        controller.seekToNextMediaItem()
+    }
+
+    suspend fun skipToPreviousTrack(){
+        val controller = awaitController()
+        controller.seekToPrevious()
+    }
 }
 
 data class AudioPlaybackState(
     val isPlaying: Boolean = false,
-    val title: String = ""
+    val title: String = "",
+    val artist: String = "",
+    val artworkUri: Uri = Uri.EMPTY,
 )

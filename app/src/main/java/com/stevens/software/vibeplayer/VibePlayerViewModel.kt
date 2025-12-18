@@ -49,12 +49,6 @@ class VibePlayerViewModel(
         duration = this.duration.toMinutesSeconds()
     ) //todo move to repo
 
-     fun playById(id: String){
-         viewModelScope.launch {
-             playbackManager.playById(id)
-         }
-
-    }
 
 }
 

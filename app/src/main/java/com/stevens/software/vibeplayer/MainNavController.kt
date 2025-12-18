@@ -4,9 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.stevens.software.vibeplayer.player.PlayerScreen
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Serializable
 object PermissionScreen
@@ -15,7 +17,7 @@ object PermissionScreen
 object VibePlayer
 
 @Serializable
-object Player
+data class Player(val id: String)
 
 @Composable
 fun MainNavController() {
@@ -30,12 +32,22 @@ fun MainNavController() {
         }
         composable<VibePlayer> {
             VibePlayerScreen(
-                viewModel = koinViewModel()
+                viewModel = koinViewModel(),
+                onNavigateToPlayer = {
+                    navController.navigate(Player(it))
+                }
             )
         }
-        composable<Player> {
+        composable<Player> { backStackEntry ->
+            val routeArgs = backStackEntry.toRoute<Player>()
             PlayerScreen(
-//                viewModel = koinViewModel()
+                viewModel = koinViewModel(
+                    parameters = {
+                        parametersOf(
+                            routeArgs.id
+                        )
+                    }
+                )
             )
         }
     }
