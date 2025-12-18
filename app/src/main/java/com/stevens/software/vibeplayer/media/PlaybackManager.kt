@@ -83,7 +83,6 @@ class PlaybackManager(
         }
         val controller = awaitController()
         controller.setMediaItems(mediaItems)
-        controller.prepare()
     }
 
     suspend fun playById(id: String) {
@@ -116,6 +115,11 @@ class PlaybackManager(
     suspend fun skipToPreviousTrack(){
         val controller = awaitController()
         controller.seekToPrevious()
+    }
+
+    suspend fun stop(){
+        val controller = awaitController()
+        controller.stop()
     }
 }
 

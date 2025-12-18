@@ -5,9 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.stevens.software.vibeplayer.media.MediaRepository
 import com.stevens.software.vibeplayer.media.PlaybackManager
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -19,6 +21,8 @@ class PlayerViewModel(
 ): ViewModel() {
 
     private val _isLoading: MutableStateFlow<Boolean> = MutableStateFlow(true)
+    private val _navigationEvents: MutableSharedFlow<PlayerNavigationEvents> = MutableSharedFlow()
+    val navigationEvents = _navigationEvents.asSharedFlow()
 
     val uiState: StateFlow<PlayerUiState> = combine(_isLoading, playbackManager.state)
     { isLoading, playbackState ->
@@ -72,6 +76,13 @@ class PlayerViewModel(
             playbackManager.skipToPreviousTrack()
         }
     }
+
+    fun onBack(){
+        viewModelScope.launch {
+            _navigationEvents.emit(PlayerNavigationEvents.NavigateBack)
+            playbackManager.stop()
+        }
+    }
 }
 
 data class PlayerUiState(
@@ -80,3 +91,7 @@ data class PlayerUiState(
     val artist: String,
     val artworkUri: Uri
 )
+
+sealed interface PlayerNavigationEvents {
+    object NavigateBack: PlayerNavigationEvents
+}

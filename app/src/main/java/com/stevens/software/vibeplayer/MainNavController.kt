@@ -47,7 +47,8 @@ fun MainNavController() {
                             routeArgs.id
                         )
                     }
-                )
+                ),
+                onBack = { navController.popBackStack() }
             )
         }
     }

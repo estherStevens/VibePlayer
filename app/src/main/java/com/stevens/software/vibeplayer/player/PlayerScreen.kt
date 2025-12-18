@@ -19,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,14 +36,24 @@ import com.stevens.software.vibeplayer.ui.theme.extendedColours
 
 @Composable
 fun PlayerScreen(
-    viewModel: PlayerViewModel
+    viewModel: PlayerViewModel,
+    onBack: () -> Unit
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.navigationEvents.collect {
+            when(it) {
+                PlayerNavigationEvents.NavigateBack -> onBack()
+            }
+        }
+    }
     PlayerView(
         isPlaying = uiState.value.isPlaying,
         title = uiState.value.title,
         artist = uiState.value.artist,
         artworkUri = uiState.value.artworkUri,
+        onBack = { viewModel.onBack() },
         onPause = { viewModel.pause() },
         onResume = { viewModel.resume() },
         onSkipToNextTrack = { viewModel.onSkipToNextTrack() },
@@ -57,6 +68,7 @@ fun PlayerView(
     title: String,
     artist: String,
     artworkUri: Uri,
+    onBack: () -> Unit,
     onPause: () -> Unit,
     onResume: () -> Unit,
     onSkipToNextTrack: () -> Unit,
@@ -81,7 +93,10 @@ fun PlayerView(
                     Icon(
                         painter = painterResource(R.drawable.back),
                         contentDescription = stringResource(R.string.back),
-                        tint = Color.Unspecified
+                        tint = Color.Unspecified,
+                        modifier = Modifier.clickable{
+                            onBack()
+                        }
                     )
                 }
             )
@@ -193,6 +208,7 @@ private fun PlayerViewPreview(){
         title = "505",
         artist = "Arctic Monkeys",
         artworkUri = Uri.EMPTY,
+        onBack = {},
         onPause = {},
         onResume = {},
         onSkipToNextTrack = {},
