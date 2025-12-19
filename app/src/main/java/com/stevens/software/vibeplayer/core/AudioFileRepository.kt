@@ -10,7 +10,7 @@ class AudioFileRepository(private val context: Context) {
 
     fun getAudioFile(id: Int): Flow<AudioFile?> = audioFileDao.getAudioFile(id)
 
-    suspend fun insertAudioFile(audioFile: AudioFile) = audioFileDao.insert(audioFile)
+    suspend fun insertAllAudioFiles(audioFile: List<AudioFile>) = audioFileDao.insertAll(audioFile)
 
     suspend fun deleteAudioFile(audioFile: AudioFile) = audioFileDao.delete(audioFile)
 

@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.map
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import androidx.core.net.toUri
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.time.OffsetDateTime
 
 class MediaProviderImpl(
@@ -35,7 +37,7 @@ class MediaProviderImpl(
     override suspend fun fetchMedia(
         minFileSizeInMs: Int?,
         minFileDurationInMs: Int?
-    ): Boolean {
+    ): Boolean = withContext(Dispatchers.IO) {
         val projection = arrayOf(
             MediaStore.Audio.Media._ID,
             MediaStore.Audio.Media.ARTIST,
@@ -64,6 +66,7 @@ class MediaProviderImpl(
             selectionArgs,
             "${MediaStore.Audio.Media.TITLE} ASC",
         )
+        val audioFiles: MutableList<AudioFile> = mutableListOf()
 
         cursor?.use {
             val id = it.getColumnIndex(MediaStore.Audio.Media._ID)
@@ -87,7 +90,7 @@ class MediaProviderImpl(
                 )
                 val mediaId = "${id}_${title}_${OffsetDateTime.now()}"
 
-                audioFileRepository.insertAudioFile(
+                audioFiles.add(
                     AudioFile(
                         id = mediaId,
                         title = title,
@@ -99,7 +102,8 @@ class MediaProviderImpl(
                 )
             }
         }
-        return true
+        audioFileRepository.insertAllAudioFiles(audioFiles)
+        true
     }
 }
 

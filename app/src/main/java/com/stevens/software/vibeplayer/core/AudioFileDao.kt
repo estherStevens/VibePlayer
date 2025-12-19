@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 interface AudioFileDao{
 
     @Insert
-    suspend fun insert(audioFile: AudioFile)
+    suspend fun insertAll(audioFile: List<AudioFile>)
 
     @Delete
     suspend fun delete(audioFile: AudioFile)

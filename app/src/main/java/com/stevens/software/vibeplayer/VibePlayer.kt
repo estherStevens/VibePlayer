@@ -259,7 +259,9 @@ private fun TrackItem(
             AsyncImage(
                 model = albumArt,
                 contentDescription = null,
-                modifier = Modifier.size(64.dp)
+                modifier = Modifier
+                    .size(64.dp),
+                placeholder = painterResource(R.drawable.tracklist_image_placeholder)
             )
         }
         Spacer(Modifier.size(12.dp))
