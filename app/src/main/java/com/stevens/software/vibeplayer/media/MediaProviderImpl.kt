@@ -2,15 +2,9 @@ package com.stevens.software.vibeplayer.media
 
 import android.content.ContentUris
 import android.content.Context
-import android.net.Uri
 import android.provider.MediaStore
 import com.stevens.software.vibeplayer.core.AudioFile
 import com.stevens.software.vibeplayer.core.AudioFileRepository
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
-import androidx.core.net.toUri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.OffsetDateTime
@@ -18,21 +12,7 @@ import java.time.OffsetDateTime
 class MediaProviderImpl(
     private val context: Context,
     private val audioFileRepository: AudioFileRepository
-    ) : MediaProvider{
-
-    override val mediaItems: Flow<List<AudioItem>> = audioFileRepository.getAllAudioFile()
-        .map { entities ->
-            entities.map { audioFile ->
-                AudioItem(
-                    id = audioFile.id,
-                    uri = audioFile.fileUri.toUri(),
-                    artist = audioFile.artist,
-                    title = audioFile.title,
-                    albumArt = audioFile.artworkUri.toUri(),
-                    duration = audioFile.duration.milliseconds
-                )
-            }
-        }
+    ) : MediaProvider {
 
     override suspend fun fetchMedia(
         minFileSizeInMs: Int?,
@@ -89,7 +69,6 @@ class MediaProviderImpl(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id
                 )
                 val mediaId = "${id}_${title}_${OffsetDateTime.now()}"
-
                 audioFiles.add(
                     AudioFile(
                         id = mediaId,
@@ -102,16 +81,8 @@ class MediaProviderImpl(
                 )
             }
         }
+        audioFileRepository.deleteAllAudioFiles()
         audioFileRepository.insertAllAudioFiles(audioFiles)
         true
     }
 }
-
-data class AudioItem(
-    val id: String,
-    val uri: Uri,
-    val artist: String,
-    val title: String,
-    val albumArt: Uri,
-    val duration: Duration,
-)

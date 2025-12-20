@@ -9,11 +9,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,6 +31,7 @@ import com.stevens.software.vibeplayer.ui.theme.extendedColours
 
 @Composable
 fun PermissionScreen(
+    paddingValues: PaddingValues,
     onNavigateToVibePlayer: () -> Unit
 ) {
     val context = LocalContext.current
@@ -60,6 +61,7 @@ fun PermissionScreen(
     }
 
     PermissionView(
+        paddingValues = paddingValues,
         onLaunchPermissionDialog = {
             launcher.launch(permission)
         }
@@ -68,12 +70,15 @@ fun PermissionScreen(
 
 @Composable
 internal fun PermissionView(
+    paddingValues: PaddingValues,
     onLaunchPermissionDialog: () -> Unit,
 ){
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = MaterialTheme.extendedColours.bg),
+            .background(color = MaterialTheme.extendedColours.bg)
+            .padding(paddingValues),
+
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -113,6 +118,7 @@ internal fun PermissionView(
 @Preview(showSystemUi = true)
 fun PermissionViewPreview(){
     PermissionView(
+        paddingValues = PaddingValues(),
         onLaunchPermissionDialog = {}
     )
 }

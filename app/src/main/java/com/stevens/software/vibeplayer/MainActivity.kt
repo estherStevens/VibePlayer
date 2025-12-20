@@ -25,7 +25,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             VibePlayerTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    MainNavController()
+                    MainNavController(innerPadding)
                 }
             }
         }

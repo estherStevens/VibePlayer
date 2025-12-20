@@ -1,14 +1,18 @@
 package com.stevens.software.vibeplayer.media
 
+import com.stevens.software.vibeplayer.core.AudioFile
+import com.stevens.software.vibeplayer.core.AudioFileRepository
+
 class MediaRepository(
     private val mediaProvider: MediaProvider,
-    private val playbackManager: PlaybackManager
+    private val playbackManager: PlaybackManager,
+    audioFileRepository: AudioFileRepository
 ) {
 
-    val mediaItems = mediaProvider.mediaItems
+    val mediaItems = audioFileRepository.getAllAudioFile()
 
-    suspend fun setMediaPlaylist(audioItems: List<AudioItem>){
-        playbackManager.setPlaylist(audioItems)
+    suspend fun setMediaPlaylist(audioFiles: List<AudioFile>){
+        playbackManager.setPlaylist(audioFiles)
     }
 
     suspend fun fetchFilteredMedia(

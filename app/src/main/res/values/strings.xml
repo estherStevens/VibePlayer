@@ -22,6 +22,10 @@
     <string name="scan">Scan</string>
     <string name="scanning">Scanning…</string>
     <string name="scroll_to_top">Scroll to top</string>
+    <string name="search">Search</string>
+    <string name="searchbar_placeholder">Search</string>
+    <string name="search_close">Close</string>
+    <string name="search_cancel">Cancel</string>
 
 
 </resources>

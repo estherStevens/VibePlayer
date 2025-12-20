@@ -2,31 +2,29 @@ package com.stevens.software.vibeplayer.media
 
 import android.content.ComponentName
 import android.content.Context
-import android.media.session.PlaybackState
 import android.net.Uri
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
+import com.stevens.software.vibeplayer.core.AudioFile
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.CompletableJob
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class PlaybackManager(
-    private val context: Context
+    context: Context
 ) {
     private val appContext = context.applicationContext
     private val sessionToken = SessionToken(
@@ -101,7 +99,6 @@ class PlaybackManager(
             ) {
                 super.onPositionDiscontinuity(oldPosition, newPosition, reason)
                 if(reason == Player.EVENT_POSITION_DISCONTINUITY) {
-                    val i = newPosition.positionMs
                     _position.update { newPosition.positionMs }
                 }
             }
@@ -122,18 +119,18 @@ class PlaybackManager(
         })
     }
 
-    suspend fun setPlaylist(items: List<AudioItem>) {
+    suspend fun setPlaylist(items: List<AudioFile>) {
         val mediaItems: MutableList<MediaItem> = mutableListOf()
         items.map { audioItem ->
             mediaItems.add(
                 MediaItem.Builder()
-                    .setUri(audioItem.uri)
+                    .setUri(audioItem.fileUri)
                     .setMediaId(audioItem.id)
                     .setMediaMetadata(
                         MediaMetadata.Builder()
                             .setTitle(audioItem.title)
                             .setArtist(audioItem.artist)
-                            .setArtworkUri(audioItem.albumArt)
+                            .setArtworkUri(audioItem.artworkUri.toUri())
                             .build()
                     ).build()
             )

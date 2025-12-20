@@ -19,6 +19,9 @@ interface AudioFileDao{
     @Update
     suspend fun update(audioFile: AudioFile)
 
+    @Query("DELETE FROM audiofiles")
+    suspend fun deleteAll()
+
     @Query("Select * from audiofiles where id = :id")
     fun getAudioFile(id: Int) : Flow<AudioFile>
 

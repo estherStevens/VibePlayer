@@ -9,6 +9,7 @@ import com.stevens.software.vibeplayer.media.MediaRepository
 import com.stevens.software.vibeplayer.media.PlaybackManager
 import com.stevens.software.vibeplayer.player.PlayerViewModel
 import com.stevens.software.vibeplayer.scan.ScanViewModel
+import com.stevens.software.vibeplayer.search.SearchViewModel
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
@@ -19,6 +20,7 @@ val appModule = module {
     viewModelOf(::VibePlayerViewModel)
     viewModelOf(::PlayerViewModel)
     viewModelOf(::ScanViewModel)
+    viewModelOf(::SearchViewModel)
     factoryOf(::MediaProviderImpl) bind MediaProvider::class
     factoryOf(::MediaRepository)
     factoryOf(::MediaService)

@@ -1,9 +1,10 @@
 package com.stevens.software.vibeplayer
 
 import android.net.Uri
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.stevens.software.vibeplayer.media.AudioItem
+import com.stevens.software.vibeplayer.core.AudioFile
 import com.stevens.software.vibeplayer.media.MediaService
 import com.stevens.software.vibeplayer.media.MediaRepository
 import com.stevens.software.vibeplayer.media.PlaybackManager
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 class VibePlayerViewModel(
     private val mediaRepository: MediaRepository,
@@ -46,12 +48,12 @@ class VibePlayerViewModel(
     }
 
 
-    fun AudioItem.toUi() = MediaItemUi(
+    fun AudioFile.toUi() = MediaItemUi(
         id = this.id,
         title = this.title,
-        albumArt = this.albumArt,
+        albumArt = this.artworkUri.toUri(),
         artist = this.artist,
-        duration = this.duration.toMinutesSeconds()
+        duration = this.duration.milliseconds.toMinutesSeconds()
     ) //todo move to repo
 
     fun onNavigateToPlayer(id: String){
@@ -63,6 +65,12 @@ class VibePlayerViewModel(
     fun onNavigateToScanMusic(){
         viewModelScope.launch {
             _navigationEvents.emit(VibePlayerNavigationEvents.NavigateToScanMusic)
+        }
+    }
+
+    fun onNavigateToSearchScreen(){
+        viewModelScope.launch {
+            _navigationEvents.emit(VibePlayerNavigationEvents.NavigateToSearch)
         }
     }
 
@@ -85,4 +93,5 @@ data class MediaItemUi(
 sealed interface VibePlayerNavigationEvents {
     object NavigateToScanMusic : VibePlayerNavigationEvents
     data class NavigateToPlayer(val id: String): VibePlayerNavigationEvents
+    object NavigateToSearch: VibePlayerNavigationEvents
 }

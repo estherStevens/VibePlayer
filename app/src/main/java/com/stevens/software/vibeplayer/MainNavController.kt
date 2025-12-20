@@ -1,5 +1,6 @@
 package com.stevens.software.vibeplayer
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -7,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.stevens.software.vibeplayer.player.PlayerScreen
 import com.stevens.software.vibeplayer.scan.ScanScreen
+import com.stevens.software.vibeplayer.search.SearchScreen
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -23,14 +25,18 @@ data class Player(val id: String)
 @Serializable
 object ScanMusic
 
+@Serializable
+object Search
+
 @Composable
-fun MainNavController() {
+fun MainNavController(innerPadding: PaddingValues) {
     val navController = rememberNavController()
 
 
     NavHost(navController = navController, startDestination = PermissionScreen) {
         composable<PermissionScreen> {
             PermissionScreen(
+                paddingValues = innerPadding,
                 onNavigateToVibePlayer = { navController.navigate(VibePlayer) }
             )
         }
@@ -42,6 +48,9 @@ fun MainNavController() {
                 },
                 onNavigateToScanMusic = {
                     navController.navigate(ScanMusic)
+                },
+                onNavigateToSearchScreen = {
+                    navController.navigate(Search)
                 }
             )
         }
@@ -63,6 +72,14 @@ fun MainNavController() {
                 viewModel = koinViewModel(),
                 onBack = { navController.popBackStack() },
                 onNavigateToTrackListing = { navController.popBackStack() }
+            )
+        }
+        composable<Search> {
+            SearchScreen(
+                viewModel = koinViewModel(),
+                paddingValues = innerPadding,
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToPlayer = { navController.navigate(Player(it)) }
             )
         }
     }
