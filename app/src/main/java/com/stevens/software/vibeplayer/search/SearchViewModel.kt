@@ -28,7 +28,7 @@ class SearchViewModel(
     private val _audioFiles: StateFlow<List<MediaItemUi>> = combine(_isSearching, _searchTerm, audioFileRepository.getAllAudioFile())
     { isSearching, searchTerm, audioFiles ->
         if(isSearching) {
-            audioFiles.filter { it.title.contains(searchTerm) || it.artist.contains(searchTerm) }.map { track -> track.toUi() }
+            audioFiles.filter { it.title.lowercase().contains(searchTerm.lowercase()) || it.artist.lowercase().contains(searchTerm.lowercase()) }.map { track -> track.toUi() }
         } else {
             emptyList()
         }

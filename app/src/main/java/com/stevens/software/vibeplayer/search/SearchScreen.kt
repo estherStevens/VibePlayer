@@ -148,7 +148,8 @@ private fun SearchBar(
                         contentDescription = stringResource(R.string.search_close),
                         tint = Color.Unspecified,
                         modifier = Modifier.clickable {
-                            onClose()
+                            searchTerm = ""
+                            onSearchTermUpdated("")
                         }
                     )
                 }
