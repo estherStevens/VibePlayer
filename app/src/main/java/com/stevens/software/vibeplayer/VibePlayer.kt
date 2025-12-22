@@ -77,6 +77,8 @@ fun VibePlayerScreen(
         onNavigateToPlayer = viewModel::onNavigateToPlayer,
         onNavigateToScanMusic = viewModel::onNavigateToScanMusic,
         onNavigateToSearchScreen = viewModel::onNavigateToSearchScreen,
+        onPlayFromBeginning = viewModel::onPlayFromBeginning,
+        onEnableShuffle = viewModel::onEnableShuffle
     )
 }
 
@@ -86,6 +88,8 @@ fun VibePlayerView(uiState: VibePlayerState,
                    onNavigateToPlayer: (String) -> Unit,
                    onNavigateToScanMusic: () -> Unit,
                    onNavigateToSearchScreen: () -> Unit,
+                   onEnableShuffle: () -> Unit,
+                   onPlayFromBeginning: () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -138,6 +142,8 @@ fun VibePlayerView(uiState: VibePlayerState,
                     TracksState(
                         tracks = uiState.tracks,
                         onNavigateToPlayer = onNavigateToPlayer,
+                        onEnableShuffle = onEnableShuffle,
+                        onPlayFromBeginning = onPlayFromBeginning
                     )
                 }
             }
@@ -192,7 +198,9 @@ private fun ScannerState(){
 
 @Composable
 private fun TracksState(tracks: List<MediaItemUi>,
-                        onNavigateToPlayer: (String) -> Unit){
+                        onNavigateToPlayer: (String) -> Unit,
+                        onEnableShuffle: () -> Unit,
+                        onPlayFromBeginning: () -> Unit){
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
     var showButton by remember { mutableStateOf(false) }
@@ -216,11 +224,11 @@ private fun TracksState(tracks: List<MediaItemUi>,
                         .fillMaxSize(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    ShuffleButton()
+                    ShuffleButton(
+                        onEnableShuffle = onEnableShuffle
+                    )
                     PlayAllButton(
-                        onPlayAllClicked = {
-                            onNavigateToPlayer("")
-                        }
+                        onPlayAllClicked = onPlayFromBeginning
                     )
                 }
                 Spacer(Modifier.size(8.dp))
@@ -262,7 +270,9 @@ private fun TracksState(tracks: List<MediaItemUi>,
 }
 
 @Composable
-private fun RowScope.ShuffleButton(){
+private fun RowScope.ShuffleButton(
+    onEnableShuffle: () -> Unit
+){
     SecondaryButton(
         buttonText = R.string.shuffle,
         leadingIcon = {
@@ -273,7 +283,7 @@ private fun RowScope.ShuffleButton(){
             )
         },
         modifier = Modifier.weight(1f),
-        onClick = {}
+        onClick = onEnableShuffle
     )
 }
 
@@ -304,6 +314,8 @@ private fun EmptyStateView() {
         onNavigateToPlayer = {},
         onNavigateToScanMusic = {},
         onNavigateToSearchScreen = {},
+        onEnableShuffle = {},
+        onPlayFromBeginning = {}
     )
 }
 
@@ -325,6 +337,8 @@ private fun TracksView() {
         onNavigateToPlayer = {},
         onNavigateToScanMusic = {},
         onNavigateToSearchScreen = {},
+        onEnableShuffle = {},
+        onPlayFromBeginning = {}
     )
 }
 
@@ -336,5 +350,7 @@ private fun ScannerView() {
         onNavigateToPlayer = {},
         onNavigateToScanMusic = {},
         onNavigateToSearchScreen = {},
+        onEnableShuffle = {},
+        onPlayFromBeginning = {}
     )
 }

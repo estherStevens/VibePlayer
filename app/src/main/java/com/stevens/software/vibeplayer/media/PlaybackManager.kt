@@ -85,7 +85,7 @@ class PlaybackManager(
                     startUpdatingPosition(controller = controller)
                     _state.update {
                         it.copy(
-                            duration = controller.contentDuration
+                            duration = controller.contentDuration,
                         )
                     }
                 } else {
@@ -111,7 +111,8 @@ class PlaybackManager(
                         it.copy(
                             title = media.mediaMetadata.title.toString(),
                             artist = media.mediaMetadata.artist.toString(),
-                            artworkUri = media.mediaMetadata.artworkUri ?: Uri.EMPTY
+                            artworkUri = media.mediaMetadata.artworkUri ?: Uri.EMPTY,
+                            isShuffleModelEnabled = controller.shuffleModeEnabled
                         )
                     }
                 }
@@ -152,9 +153,10 @@ class PlaybackManager(
         }
     }
 
-    suspend fun playAllFromStart(){
+    private suspend fun playAllFromStart(){
         val controller = awaitController()
-        controller.seekTo(0)
+        controller.prepare()
+        controller.seekTo(0, 0)
         controller.play()
     }
 
@@ -178,14 +180,29 @@ class PlaybackManager(
         controller.seekToPrevious()
     }
 
-    suspend fun stop(){
+    suspend fun enableShuffle(enabled: Boolean){
         val controller = awaitController()
-        controller.stop()
+        controller.shuffleModeEnabled = enabled
     }
 
     suspend fun seek(position: Long) {
         val controller = awaitController()
         controller.seekTo(position)
+    }
+
+    suspend fun play(){
+        val controller = awaitController()
+        when(controller.shuffleModeEnabled) {
+            true -> {
+                controller.prepare()
+                val firstShuffled = controller.nextMediaItemIndex
+                controller.seekTo(firstShuffled, 0)
+                controller.play()
+            }
+            false -> {
+                playAllFromStart()
+            }
+        }
     }
 }
 
@@ -196,4 +213,5 @@ data class AudioPlaybackState(
     val title: String = "",
     val artist: String = "",
     val artworkUri: Uri = Uri.EMPTY,
+    val isShuffleModelEnabled: Boolean = false
 )

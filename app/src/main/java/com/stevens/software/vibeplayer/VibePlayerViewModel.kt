@@ -56,6 +56,20 @@ class VibePlayerViewModel(
         duration = this.duration.milliseconds.toMinutesSeconds()
     ) //todo move to repo
 
+    fun onEnableShuffle(){
+        viewModelScope.launch {
+            playbackManager.enableShuffle(true)
+            onNavigateToPlayer("")
+        }
+    }
+
+    fun onPlayFromBeginning() {
+        viewModelScope.launch {
+            playbackManager.enableShuffle(false)
+            onNavigateToPlayer("")
+        }
+    }
+
     fun onNavigateToPlayer(id: String){
         viewModelScope.launch {
             _navigationEvents.emit(VibePlayerNavigationEvents.NavigateToPlayer(id))

@@ -32,7 +32,7 @@ class PlayerViewModel(
             isPlaying = playbackState.isPlaying,
             artist = playbackState.artist,
             title = playbackState.title,
-            artworkUri = playbackState.artworkUri
+            artworkUri = playbackState.artworkUri,
         )
     }.stateIn(
         viewModelScope,
@@ -49,7 +49,7 @@ class PlayerViewModel(
 
     init {
         when {
-            id.isEmpty() -> playFromBeginning()
+            id.isEmpty() -> play()
             else -> playById(id)
         }
     }
@@ -97,9 +97,9 @@ class PlayerViewModel(
         }
     }
 
-    private fun playFromBeginning(){
+    private fun play(){
         viewModelScope.launch {
-            playbackManager.playAllFromStart()
+            playbackManager.play()
         }
     }
 
