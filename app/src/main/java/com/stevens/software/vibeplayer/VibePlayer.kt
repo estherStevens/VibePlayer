@@ -7,6 +7,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -39,6 +41,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.stevens.software.vibeplayer.ui.common.Scanner
+import com.stevens.software.vibeplayer.ui.common.SecondaryButton
 import com.stevens.software.vibeplayer.ui.common.TrackItem
 import com.stevens.software.vibeplayer.ui.theme.PrimaryButton
 import com.stevens.software.vibeplayer.ui.theme.extendedColours
@@ -73,7 +76,7 @@ fun VibePlayerScreen(
         uiState = uiState.value,
         onNavigateToPlayer = viewModel::onNavigateToPlayer,
         onNavigateToScanMusic = viewModel::onNavigateToScanMusic,
-        onNavigateToSearchScreen = viewModel::onNavigateToSearchScreen
+        onNavigateToSearchScreen = viewModel::onNavigateToSearchScreen,
     )
 }
 
@@ -82,7 +85,7 @@ fun VibePlayerScreen(
 fun VibePlayerView(uiState: VibePlayerState,
                    onNavigateToPlayer: (String) -> Unit,
                    onNavigateToScanMusic: () -> Unit,
-                   onNavigateToSearchScreen: () -> Unit
+                   onNavigateToSearchScreen: () -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -134,7 +137,7 @@ fun VibePlayerView(uiState: VibePlayerState,
                 is VibePlayerState.Tracks -> {
                     TracksState(
                         tracks = uiState.tracks,
-                        onNavigateToPlayer = onNavigateToPlayer
+                        onNavigateToPlayer = onNavigateToPlayer,
                     )
                 }
             }
@@ -204,8 +207,24 @@ private fun TracksState(tracks: List<MediaItemUi>,
     Box {
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(12.dp),
-            state = listState
+            state = listState,
+            modifier = Modifier.padding(horizontal = 16.dp)
         ) {
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    ShuffleButton()
+                    PlayAllButton(
+                        onPlayAllClicked = {
+                            onNavigateToPlayer("")
+                        }
+                    )
+                }
+                Spacer(Modifier.size(8.dp))
+            }
             items(tracks) {
                 TrackItem(
                     id = it.id,
@@ -242,6 +261,41 @@ private fun TracksState(tracks: List<MediaItemUi>,
     }
 }
 
+@Composable
+private fun RowScope.ShuffleButton(){
+    SecondaryButton(
+        buttonText = R.string.shuffle,
+        leadingIcon = {
+            Icon(
+                painter = painterResource(R.drawable.shuffle),
+                contentDescription = null,
+                tint = Color.Unspecified
+            )
+        },
+        modifier = Modifier.weight(1f),
+        onClick = {}
+    )
+}
+
+
+@Composable
+private fun RowScope.PlayAllButton(
+    onPlayAllClicked: () -> Unit
+){
+    SecondaryButton(
+        buttonText = R.string.play_all,
+        leadingIcon = {
+            Icon(
+                painter = painterResource(R.drawable.play_all),
+                contentDescription = null,
+                tint = Color.Unspecified
+            )
+        },
+        modifier = Modifier.weight(1f),
+        onClick = onPlayAllClicked
+    )
+}
+
 @Preview(showSystemUi = true)
 @Composable
 private fun EmptyStateView() {
@@ -249,7 +303,7 @@ private fun EmptyStateView() {
         VibePlayerState.Empty,
         onNavigateToPlayer = {},
         onNavigateToScanMusic = {},
-        onNavigateToSearchScreen = {}
+        onNavigateToSearchScreen = {},
     )
 }
 
@@ -281,6 +335,6 @@ private fun ScannerView() {
         VibePlayerState.Scanning,
         onNavigateToPlayer = {},
         onNavigateToScanMusic = {},
-        onNavigateToSearchScreen = {}
+        onNavigateToSearchScreen = {},
     )
 }

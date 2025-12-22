@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class PlaybackManager(
@@ -56,7 +57,7 @@ class PlaybackManager(
 
     private fun startUpdatingPosition(controller: MediaController){
         job = scope.launch {
-            while (true) {
+            while (isActive) {
                 if(controller.isPlaying){
                     _state.update {
                         it.copy(
@@ -149,6 +150,12 @@ class PlaybackManager(
                 return
             }
         }
+    }
+
+    suspend fun playAllFromStart(){
+        val controller = awaitController()
+        controller.seekTo(0)
+        controller.play()
     }
 
     suspend fun pause(){

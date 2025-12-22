@@ -33,7 +33,6 @@ fun TrackItem(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .padding(horizontal = 16.dp)
             .clickable {
                 onNavigateToPlayer(id)
             }

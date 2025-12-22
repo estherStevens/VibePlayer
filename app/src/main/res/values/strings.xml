@@ -26,6 +26,8 @@
     <string name="searchbar_placeholder">Search</string>
     <string name="search_close">Close</string>
     <string name="search_cancel">Cancel</string>
+    <string name="shuffle">Shuffle</string>
+    <string name="play_all">Play</string>
 
 
 </resources>

@@ -48,7 +48,10 @@ class PlayerViewModel(
     )
 
     init {
-        playById(id)
+        when {
+            id.isEmpty() -> playFromBeginning()
+            else -> playById(id)
+        }
     }
 
     fun playById(id: String){
@@ -84,13 +87,19 @@ class PlayerViewModel(
     fun onBack(){
         viewModelScope.launch {
             _navigationEvents.emit(PlayerNavigationEvents.NavigateBack)
-            playbackManager.stop()
+            playbackManager.pause()
         }
     }
 
     fun onSeek(position: Long){
         viewModelScope.launch {
             playbackManager.seek(position)
+        }
+    }
+
+    private fun playFromBeginning(){
+        viewModelScope.launch {
+            playbackManager.playAllFromStart()
         }
     }
 

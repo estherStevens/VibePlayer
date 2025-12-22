@@ -73,7 +73,6 @@ class VibePlayerViewModel(
             _navigationEvents.emit(VibePlayerNavigationEvents.NavigateToSearch)
         }
     }
-
 }
 
 sealed interface VibePlayerState {
