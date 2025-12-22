@@ -59,11 +59,11 @@ class PlaybackManager(
         job = scope.launch {
             while (isActive) {
                 if(controller.isPlaying){
-                    _state.update {
-                        it.copy(
-                            currentPosition = controller.currentPosition
-                        )
-                    }
+//                    _state.update {
+//                        it.copy(
+//                            currentPosition = controller.currentPosition
+//                        )
+//                    }
                     delay(1000)
                 }
             }
@@ -112,7 +112,7 @@ class PlaybackManager(
                             title = media.mediaMetadata.title.toString(),
                             artist = media.mediaMetadata.artist.toString(),
                             artworkUri = media.mediaMetadata.artworkUri ?: Uri.EMPTY,
-                            isShuffleModelEnabled = controller.shuffleModeEnabled
+                            isShuffleModeEnabled = controller.shuffleModeEnabled
                         )
                     }
                 }
@@ -183,6 +183,9 @@ class PlaybackManager(
     suspend fun enableShuffle(enabled: Boolean){
         val controller = awaitController()
         controller.shuffleModeEnabled = enabled
+        _state.update {
+            it.copy(isShuffleModeEnabled = enabled)
+        }
     }
 
     suspend fun seek(position: Long) {
@@ -213,5 +216,5 @@ data class AudioPlaybackState(
     val title: String = "",
     val artist: String = "",
     val artworkUri: Uri = Uri.EMPTY,
-    val isShuffleModelEnabled: Boolean = false
+    val isShuffleModeEnabled: Boolean = false
 )

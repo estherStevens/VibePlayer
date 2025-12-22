@@ -11,6 +11,7 @@
     <string name="previous_track">Previous track</string>
     <string name="next_track">Next track</string>
     <string name="play_track">Play</string>
+    <string name="repeat">Repeat</string>
     <string name="scan_music">Scan Music</string>
     <string name="scan_music_duration"> Ignore duration less than</string>
     <string name="scan_music_size">Ignore size less than</string>
@@ -25,9 +26,12 @@
     <string name="search">Search</string>
     <string name="searchbar_placeholder">Search</string>
     <string name="search_close">Close</string>
-    <string name="search_cancel">Cancel</string>
     <string name="shuffle">Shuffle</string>
+    <string name="search_cancel">Cancel</string>
+    <string name="enable_shuffle">Enable Shuffle</string>
+    <string name="disable_shuffle">Disable Shuffle</string>
     <string name="play_all">Play</string>
+    <string name="number_of_tracks">%s Songs</string>
 
 
 </resources>

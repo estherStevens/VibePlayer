@@ -24,6 +24,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -59,12 +63,14 @@ fun PlayerScreen(
         artworkUri = uiState.value.artworkUri,
         currentPosition = uiState.value.currentPosition,
         duration = uiState.value.duration,
+        isShuffleModeEnabled = uiState.value.isShuffleEnabled,
         onBack = { viewModel.onBack() },
         onPause = { viewModel.pause() },
         onResume = { viewModel.resume() },
         onSkipToNextTrack = { viewModel.onSkipToNextTrack() },
         onSkipToPreviousTrack = { viewModel.onSkipToPreviousTrack() },
-        onSeek = { viewModel.onSeek(it) }
+        onSeek = { viewModel.onSeek(it) },
+        onEnableShuffle = viewModel::onEnableShuffle
     )
 }
 
@@ -77,12 +83,14 @@ fun PlayerView(
     title: String,
     artist: String,
     artworkUri: Uri,
+    isShuffleModeEnabled: Boolean,
     onBack: () -> Unit,
     onPause: () -> Unit,
     onResume: () -> Unit,
     onSkipToNextTrack: () -> Unit,
     onSkipToPreviousTrack: () -> Unit,
-    onSeek: (Long) -> Unit
+    onSeek: (Long) -> Unit,
+    onEnableShuffle: (Boolean) -> Unit
 ){
     Box(
         modifier = Modifier
@@ -101,7 +109,7 @@ fun PlayerView(
                 ),
                 navigationIcon = {
                     Icon(
-                        painter = painterResource(R.drawable.back),
+                        painter = painterResource(R.drawable.arrow_down),
                         contentDescription = stringResource(R.string.back),
                         tint = Color.Unspecified,
                         modifier = Modifier.clickable{
@@ -131,11 +139,13 @@ fun PlayerView(
                 currentPosition = currentPosition,
                 duration = duration,
                 isPlaying = isPlaying,
+                isShuffleModeEnabled = isShuffleModeEnabled,
                 onPause = onPause,
                 onResume = onResume,
                 onSkipToNextTrack = onSkipToNextTrack,
                 onSkipToPreviousTrack = onSkipToPreviousTrack,
-                onSeek = onSeek
+                onSeek = onSeek,
+                onEnableShuffle = onEnableShuffle
             )
         }
     }
@@ -164,11 +174,13 @@ private fun TrackControls(
     currentPosition: Long,
     duration: Long,
     isPlaying: Boolean,
+    isShuffleModeEnabled: Boolean,
     onPause: () -> Unit,
     onResume: () -> Unit,
     onSeek: (Long) -> Unit,
     onSkipToNextTrack: () -> Unit,
-    onSkipToPreviousTrack: () -> Unit
+    onSkipToPreviousTrack: () -> Unit,
+    onEnableShuffle: (Boolean) -> Unit
 ){
     Column(
         modifier = Modifier
@@ -189,6 +201,15 @@ private fun TrackControls(
                 .padding(bottom = 30.dp)
                 .fillMaxWidth()
         ) {
+            Icon(
+                painter = painterResource(R.drawable.repeat_all_disabled),
+                contentDescription = stringResource(R.string.repeat),
+                tint = Color.Unspecified,
+                modifier = Modifier.clickable {
+                    onSkipToNextTrack()
+                }
+            )
+            Spacer(Modifier.weight(1f))
             Icon(
                 painter = painterResource(R.drawable.player_back),
                 contentDescription = stringResource(R.string.previous_track),
@@ -226,8 +247,36 @@ private fun TrackControls(
                     onSkipToNextTrack()
                 }
             )
+            Spacer(Modifier.weight(1f))
+            Shuffle(
+                isShuffleModeEnabled = isShuffleModeEnabled,
+                onEnableShuffle = onEnableShuffle
+            )
         }
     }
+}
+
+@Composable
+private fun Shuffle(
+    isShuffleModeEnabled: Boolean,
+    onEnableShuffle: (Boolean) -> Unit
+){
+    val image = when(isShuffleModeEnabled) {
+        true -> painterResource(R.drawable.player_shuffle_enabled)
+        false -> painterResource(R.drawable.player_shuffle_disabled)
+    }
+    val contentDescription = when(isShuffleModeEnabled) {
+        true -> stringResource(R.string.disable_shuffle)
+        false -> stringResource(R.string.enable_shuffle)
+    }
+    Icon(
+        painter = image,
+        contentDescription = contentDescription,
+        tint = Color.Unspecified,
+        modifier = Modifier.clickable {
+            onEnableShuffle(isShuffleModeEnabled.not())
+        }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -280,6 +329,7 @@ private fun PlayerViewPreview(){
         title = "505",
         artist = "Arctic Monkeys",
         artworkUri = Uri.EMPTY,
+        isShuffleModeEnabled = false,
         currentPosition = 0,
         duration = 0,
         onBack = {},
@@ -287,6 +337,7 @@ private fun PlayerViewPreview(){
         onResume = {},
         onSkipToNextTrack = {},
         onSkipToPreviousTrack = {},
-        onSeek = {}
+        onSeek = {},
+        onEnableShuffle = {}
     )
 }

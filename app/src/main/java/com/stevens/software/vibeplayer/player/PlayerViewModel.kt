@@ -33,6 +33,7 @@ class PlayerViewModel(
             artist = playbackState.artist,
             title = playbackState.title,
             artworkUri = playbackState.artworkUri,
+            isShuffleEnabled = playbackState.isShuffleModeEnabled
         )
     }.stateIn(
         viewModelScope,
@@ -43,7 +44,8 @@ class PlayerViewModel(
             duration = 0L,
             title = "",
             artist = "",
-            artworkUri = Uri.EMPTY
+            artworkUri = Uri.EMPTY,
+            isShuffleEnabled = false
         )
     )
 
@@ -84,6 +86,12 @@ class PlayerViewModel(
         }
     }
 
+    fun onEnableShuffle(enabled: Boolean) {
+        viewModelScope.launch {
+            playbackManager.enableShuffle(enabled)
+        }
+    }
+
     fun onBack(){
         viewModelScope.launch {
             _navigationEvents.emit(PlayerNavigationEvents.NavigateBack)
@@ -115,7 +123,8 @@ data class PlayerUiState(
     val isPlaying: Boolean,
     val title: String,
     val artist: String,
-    val artworkUri: Uri
+    val artworkUri: Uri,
+    val isShuffleEnabled: Boolean
 )
 
 sealed interface PlayerNavigationEvents {

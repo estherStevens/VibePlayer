@@ -233,6 +233,14 @@ private fun TracksState(tracks: List<MediaItemUi>,
                 }
                 Spacer(Modifier.size(8.dp))
             }
+            item {
+                Text(
+                    text = stringResource(R.string.number_of_tracks, tracks.size),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.extendedColours.textSecondary
+                )
+                Spacer(Modifier.size(8.dp))
+            }
             items(tracks) {
                 TrackItem(
                     id = it.id,
