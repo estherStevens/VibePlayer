@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.stevens.software.vibeplayer.media.MediaRepository
 import com.stevens.software.vibeplayer.media.PlaybackManager
+import com.stevens.software.vibeplayer.media.RepeatMode
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -33,7 +34,8 @@ class PlayerViewModel(
             artist = playbackState.artist,
             title = playbackState.title,
             artworkUri = playbackState.artworkUri,
-            isShuffleEnabled = playbackState.isShuffleModeEnabled
+            isShuffleEnabled = playbackState.isShuffleModeEnabled,
+            repeatMode = playbackState.repeatMode
         )
     }.stateIn(
         viewModelScope,
@@ -45,7 +47,8 @@ class PlayerViewModel(
             title = "",
             artist = "",
             artworkUri = Uri.EMPTY,
-            isShuffleEnabled = false
+            isShuffleEnabled = false,
+            repeatMode = RepeatMode.REPEAT_OFF
         )
     )
 
@@ -83,6 +86,16 @@ class PlayerViewModel(
     fun onSkipToPreviousTrack(){
         viewModelScope.launch {
             playbackManager.skipToPreviousTrack()
+        }
+    }
+
+    fun onRepeatModeChanged(repeatMode: RepeatMode) {
+        viewModelScope.launch {
+           when(repeatMode) {
+                RepeatMode.REPEAT_OFF -> playbackManager.enableRepeatAll()
+                RepeatMode.REPEAT_ALL -> playbackManager.enableRepeatOne()
+                RepeatMode.REPEAT_ONE -> playbackManager.disableRepeat()
+            }
         }
     }
 
@@ -124,7 +137,8 @@ data class PlayerUiState(
     val title: String,
     val artist: String,
     val artworkUri: Uri,
-    val isShuffleEnabled: Boolean
+    val isShuffleEnabled: Boolean,
+    val repeatMode: RepeatMode
 )
 
 sealed interface PlayerNavigationEvents {

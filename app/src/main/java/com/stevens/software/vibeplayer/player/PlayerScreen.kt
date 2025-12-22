@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.stevens.software.vibeplayer.R
+import com.stevens.software.vibeplayer.media.RepeatMode
 import com.stevens.software.vibeplayer.ui.theme.extendedColours
 
 @Composable
@@ -64,13 +65,15 @@ fun PlayerScreen(
         currentPosition = uiState.value.currentPosition,
         duration = uiState.value.duration,
         isShuffleModeEnabled = uiState.value.isShuffleEnabled,
+        repeatMode = uiState.value.repeatMode,
         onBack = { viewModel.onBack() },
         onPause = { viewModel.pause() },
         onResume = { viewModel.resume() },
         onSkipToNextTrack = { viewModel.onSkipToNextTrack() },
         onSkipToPreviousTrack = { viewModel.onSkipToPreviousTrack() },
         onSeek = { viewModel.onSeek(it) },
-        onEnableShuffle = viewModel::onEnableShuffle
+        onEnableShuffle = viewModel::onEnableShuffle,
+        onEnableRepeatMode = viewModel::onRepeatModeChanged
     )
 }
 
@@ -84,13 +87,15 @@ fun PlayerView(
     artist: String,
     artworkUri: Uri,
     isShuffleModeEnabled: Boolean,
+    repeatMode: RepeatMode,
     onBack: () -> Unit,
     onPause: () -> Unit,
     onResume: () -> Unit,
     onSkipToNextTrack: () -> Unit,
     onSkipToPreviousTrack: () -> Unit,
     onSeek: (Long) -> Unit,
-    onEnableShuffle: (Boolean) -> Unit
+    onEnableShuffle: (Boolean) -> Unit,
+    onEnableRepeatMode: (RepeatMode) -> Unit
 ){
     Box(
         modifier = Modifier
@@ -140,12 +145,14 @@ fun PlayerView(
                 duration = duration,
                 isPlaying = isPlaying,
                 isShuffleModeEnabled = isShuffleModeEnabled,
+                repeatMode = repeatMode,
                 onPause = onPause,
                 onResume = onResume,
                 onSkipToNextTrack = onSkipToNextTrack,
                 onSkipToPreviousTrack = onSkipToPreviousTrack,
                 onSeek = onSeek,
-                onEnableShuffle = onEnableShuffle
+                onEnableShuffle = onEnableShuffle,
+                onEnableRepeatMode = onEnableRepeatMode
             )
         }
     }
@@ -175,12 +182,14 @@ private fun TrackControls(
     duration: Long,
     isPlaying: Boolean,
     isShuffleModeEnabled: Boolean,
+    repeatMode: RepeatMode,
     onPause: () -> Unit,
     onResume: () -> Unit,
     onSeek: (Long) -> Unit,
     onSkipToNextTrack: () -> Unit,
     onSkipToPreviousTrack: () -> Unit,
-    onEnableShuffle: (Boolean) -> Unit
+    onEnableShuffle: (Boolean) -> Unit,
+    onEnableRepeatMode: (RepeatMode) -> Unit
 ){
     Column(
         modifier = Modifier
@@ -201,13 +210,9 @@ private fun TrackControls(
                 .padding(bottom = 30.dp)
                 .fillMaxWidth()
         ) {
-            Icon(
-                painter = painterResource(R.drawable.repeat_all_disabled),
-                contentDescription = stringResource(R.string.repeat),
-                tint = Color.Unspecified,
-                modifier = Modifier.clickable {
-                    onSkipToNextTrack()
-                }
+            Repeat(
+                repeatMode = repeatMode,
+                onEnableRepeatMode = onEnableRepeatMode
             )
             Spacer(Modifier.weight(1f))
             Icon(
@@ -254,6 +259,26 @@ private fun TrackControls(
             )
         }
     }
+}
+
+@Composable
+private fun Repeat(
+    repeatMode: RepeatMode,
+    onEnableRepeatMode: (RepeatMode) -> Unit
+){
+    val image = when(repeatMode) {
+        RepeatMode.REPEAT_ALL -> painterResource(R.drawable.player_repeat_all_enabled)
+        RepeatMode.REPEAT_ONE -> painterResource(R.drawable.player_repeat_one_enabled)
+        RepeatMode.REPEAT_OFF -> painterResource(R.drawable.repeat_all_disabled)
+    }
+    Icon(
+        painter = image,
+        contentDescription = null,
+        tint = Color.Unspecified,
+        modifier = Modifier.clickable {
+            onEnableRepeatMode(repeatMode)
+        }
+    )
 }
 
 @Composable
@@ -330,6 +355,7 @@ private fun PlayerViewPreview(){
         artist = "Arctic Monkeys",
         artworkUri = Uri.EMPTY,
         isShuffleModeEnabled = false,
+        repeatMode = RepeatMode.REPEAT_OFF,
         currentPosition = 0,
         duration = 0,
         onBack = {},
@@ -338,6 +364,7 @@ private fun PlayerViewPreview(){
         onSkipToNextTrack = {},
         onSkipToPreviousTrack = {},
         onSeek = {},
-        onEnableShuffle = {}
+        onEnableShuffle = {},
+        onEnableRepeatMode = {}
     )
 }

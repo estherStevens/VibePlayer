@@ -10,6 +10,7 @@ import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
+import androidx.media3.session.legacy.PlaybackStateCompat
 import com.stevens.software.vibeplayer.core.AudioFile
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -59,11 +60,11 @@ class PlaybackManager(
         job = scope.launch {
             while (isActive) {
                 if(controller.isPlaying){
-//                    _state.update {
-//                        it.copy(
-//                            currentPosition = controller.currentPosition
-//                        )
-//                    }
+                    _state.update {
+                        it.copy(
+                            currentPosition = controller.currentPosition
+                        )
+                    }
                     delay(1000)
                 }
             }
@@ -188,6 +189,39 @@ class PlaybackManager(
         }
     }
 
+    suspend fun enableRepeatAll(){
+        val controller = awaitController()
+        controller.prepare()
+        controller.repeatMode = Player.REPEAT_MODE_ALL
+        _state.update {
+            it.copy(
+                repeatMode = RepeatMode.REPEAT_ALL
+            )
+        }
+    }
+
+    suspend fun enableRepeatOne(){
+        val controller = awaitController()
+        controller.prepare()
+        controller.repeatMode = Player.REPEAT_MODE_ONE
+        _state.update {
+            it.copy(
+                repeatMode = RepeatMode.REPEAT_ONE
+            )
+        }
+    }
+
+    suspend fun disableRepeat(){
+        val controller = awaitController()
+        controller.prepare()
+        controller.repeatMode = Player.REPEAT_MODE_OFF
+        _state.update {
+            it.copy(
+                repeatMode = RepeatMode.REPEAT_OFF
+            )
+        }
+    }
+
     suspend fun seek(position: Long) {
         val controller = awaitController()
         controller.seekTo(position)
@@ -216,5 +250,13 @@ data class AudioPlaybackState(
     val title: String = "",
     val artist: String = "",
     val artworkUri: Uri = Uri.EMPTY,
-    val isShuffleModeEnabled: Boolean = false
+    val isShuffleModeEnabled: Boolean = false,
+    val isRepeatAllEnabled: Boolean = false,
+    val repeatMode: RepeatMode = RepeatMode.REPEAT_OFF
 )
+
+enum class RepeatMode {
+    REPEAT_ALL,
+    REPEAT_ONE,
+    REPEAT_OFF
+}
