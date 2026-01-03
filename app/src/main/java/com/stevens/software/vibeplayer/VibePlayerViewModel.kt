@@ -14,9 +14,11 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.time.Duration.Companion.milliseconds
 
 class VibePlayerViewModel(
@@ -32,7 +34,6 @@ class VibePlayerViewModel(
         if (it.isEmpty()) {
             VibePlayerState.Empty
         } else {
-            mediaRepository.setMediaPlaylist(it)
             VibePlayerState.Tracks(it.map { track -> track.toUi() })
         }
     }.stateIn(
@@ -44,6 +45,10 @@ class VibePlayerViewModel(
     init {
         viewModelScope.launch(Dispatchers.IO) {
             mediaRepository.fetchAllMedia()
+            val items = mediaRepository.mediaItems.first { it.isNotEmpty() }
+            withContext(Dispatchers.Main) {
+                mediaRepository.setMediaPlaylist(items)
+            }
         }
     }
 

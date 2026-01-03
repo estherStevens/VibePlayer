@@ -108,7 +108,6 @@ class PlayerViewModel(
     fun onBack(){
         viewModelScope.launch {
             _navigationEvents.emit(PlayerNavigationEvents.NavigateBack)
-            playbackManager.pause()
         }
     }
 

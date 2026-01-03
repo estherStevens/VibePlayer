@@ -40,6 +40,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.stevens.software.vibeplayer.player.MinimisedPlayerView
+import com.stevens.software.vibeplayer.player.MinimisedPlayerViewModel
 import com.stevens.software.vibeplayer.ui.common.Scanner
 import com.stevens.software.vibeplayer.ui.common.SecondaryButton
 import com.stevens.software.vibeplayer.ui.common.TrackItem
@@ -50,6 +53,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun VibePlayerScreen(
     viewModel: VibePlayerViewModel,
+    minimisedPlayerViewModel: MinimisedPlayerViewModel,
     onNavigateToPlayer: (String) -> Unit,
     onNavigateToScanMusic: () -> Unit,
     onNavigateToSearchScreen: () -> Unit
@@ -74,6 +78,7 @@ fun VibePlayerScreen(
 
     VibePlayerView(
         uiState = uiState.value,
+        minimisedPlayerViewModel = minimisedPlayerViewModel,
         onNavigateToPlayer = viewModel::onNavigateToPlayer,
         onNavigateToScanMusic = viewModel::onNavigateToScanMusic,
         onNavigateToSearchScreen = viewModel::onNavigateToSearchScreen,
@@ -85,6 +90,7 @@ fun VibePlayerScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VibePlayerView(uiState: VibePlayerState,
+                   minimisedPlayerViewModel: MinimisedPlayerViewModel,
                    onNavigateToPlayer: (String) -> Unit,
                    onNavigateToScanMusic: () -> Unit,
                    onNavigateToSearchScreen: () -> Unit,
@@ -149,6 +155,12 @@ fun VibePlayerView(uiState: VibePlayerState,
             }
         }
 
+        MinimisedPlayerView(
+            viewModel = minimisedPlayerViewModel,
+            modifier = Modifier.align(
+                Alignment.BottomStart
+            )
+        )
     }
 }
 
@@ -314,51 +326,51 @@ private fun RowScope.PlayAllButton(
     )
 }
 
-@Preview(showSystemUi = true)
-@Composable
-private fun EmptyStateView() {
-    VibePlayerView(
-        VibePlayerState.Empty,
-        onNavigateToPlayer = {},
-        onNavigateToScanMusic = {},
-        onNavigateToSearchScreen = {},
-        onEnableShuffle = {},
-        onPlayFromBeginning = {}
-    )
-}
-
-@Preview(showSystemUi = true)
-@Composable
-private fun TracksView() {
-    VibePlayerView(
-        VibePlayerState.Tracks(
-            listOf(
-                MediaItemUi(
-                    id = "1",
-                    title = "really really really really  really long title",
-                    duration = "3:00",
-                    albumArt = Uri.EMPTY,
-                    artist = "Arctic Monkeys"
-                )
-            )
-        ),
-        onNavigateToPlayer = {},
-        onNavigateToScanMusic = {},
-        onNavigateToSearchScreen = {},
-        onEnableShuffle = {},
-        onPlayFromBeginning = {}
-    )
-}
-
-@Preview(showSystemUi = true)
-@Composable
-private fun ScannerView() {
-    VibePlayerView(
-        VibePlayerState.Scanning,
-        onNavigateToPlayer = {},
-        onNavigateToScanMusic = {},
-        onNavigateToSearchScreen = {},
-        onEnableShuffle = {},
-        onPlayFromBeginning = {}
-    )
-}
+//@Preview(showSystemUi = true)
+//@Composable
+//private fun EmptyStateView() {
+//    VibePlayerView(
+//        VibePlayerState.Empty,
+//        onNavigateToPlayer = {},
+//        onNavigateToScanMusic = {},
+//        onNavigateToSearchScreen = {},
+//        onEnableShuffle = {},
+//        onPlayFromBeginning = {}
+//    )
+//}
+//
+//@Preview(showSystemUi = true)
+//@Composable
+//private fun TracksView() {
+//    VibePlayerView(
+//        VibePlayerState.Tracks(
+//            listOf(
+//                MediaItemUi(
+//                    id = "1",
+//                    title = "really really really really  really long title",
+//                    duration = "3:00",
+//                    albumArt = Uri.EMPTY,
+//                    artist = "Arctic Monkeys"
+//                )
+//            )
+//        ),
+//        onNavigateToPlayer = {},
+//        onNavigateToScanMusic = {},
+//        onNavigateToSearchScreen = {},
+//        onEnableShuffle = {},
+//        onPlayFromBeginning = {}
+//    )
+//}
+//
+//@Preview(showSystemUi = true)
+//@Composable
+//private fun ScannerView() {
+//    VibePlayerView(
+//        VibePlayerState.Scanning,
+//        onNavigateToPlayer = {},
+//        onNavigateToScanMusic = {},
+//        onNavigateToSearchScreen = {},
+//        onEnableShuffle = {},
+//        onPlayFromBeginning = {}
+//    )
+//}

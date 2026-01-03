@@ -43,6 +43,7 @@ fun MainNavController(innerPadding: PaddingValues) {
         composable<VibePlayer> {
             VibePlayerScreen(
                 viewModel = koinViewModel(),
+                minimisedPlayerViewModel = koinViewModel(),
                 onNavigateToPlayer = {
                     navController.navigate(Player(it))
                 },

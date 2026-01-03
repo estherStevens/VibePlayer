@@ -7,6 +7,7 @@ import com.stevens.software.vibeplayer.media.MediaService
 import com.stevens.software.vibeplayer.media.MediaProvider
 import com.stevens.software.vibeplayer.media.MediaRepository
 import com.stevens.software.vibeplayer.media.PlaybackManager
+import com.stevens.software.vibeplayer.player.MinimisedPlayerViewModel
 import com.stevens.software.vibeplayer.player.PlayerViewModel
 import com.stevens.software.vibeplayer.scan.ScanViewModel
 import com.stevens.software.vibeplayer.search.SearchViewModel
@@ -21,6 +22,7 @@ val appModule = module {
     viewModelOf(::PlayerViewModel)
     viewModelOf(::ScanViewModel)
     viewModelOf(::SearchViewModel)
+    viewModelOf(::MinimisedPlayerViewModel)
     factoryOf(::MediaProviderImpl) bind MediaProvider::class
     factoryOf(::MediaRepository)
     factoryOf(::MediaService)
